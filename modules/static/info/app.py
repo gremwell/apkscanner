@@ -1,7 +1,5 @@
-import urllib
 import urllib2
 import hashlib
-import json
 
 import framework
 import re
@@ -74,11 +72,11 @@ class Module(framework.module):
             else:
                 self.warning(
                     "'%s' application's description and icon could not be found in the page" % str(self.apk.package))
-        except urllib2.URLError:
-            self.warning("Network is down")
-            pass
         except urllib2.HTTPError:
             self.warning("'%s' application name does not exist on Google Play" % str(self.apk.package))
+            pass
+        except urllib2.URLError:
+            self.warning("Network is down")
             pass
 
         return {
