@@ -4,6 +4,9 @@ import logging
 import traceback
 
 import base
+import os
+import signal
+
 sys.path.append('./libs/')
 
 ERROR_VALUE_NOT_FOUND = 'N/A'
@@ -49,6 +52,7 @@ class module(object):
         if self.apk is not None:
             self.manifest = self.apk.get_android_manifest_xml().getElementsByTagName("manifest")[0]
         self.avd = avd
+        self.subprocesses = []
 
     def module_run(self):
         return
@@ -150,7 +154,7 @@ class module(object):
             actions = intentfilter.getElementsByTagName("action")
             categories = intentfilter.getElementsByTagName("category")
             intentfilters.append({
-                "action": actions[0].attributes["android:name"].value if len(actions) is not None else None,
+                "action": actions[0].attributes["android:name"].value if len(actions) else None,
                 "category": categories[0].attributes["android:name"].value if len(categories) else None
             })
 
@@ -188,13 +192,15 @@ class module(object):
         receivers = []
         application = self.manifest.getElementsByTagName("application")[0]
         for receiver in application.getElementsByTagName("receiver"):
+
             receivers.append({
                 "enabled": True if self._is_enabled(receiver) else False,
                 "exported": True if self._is_exported(receiver) else False,
                 "label": self._get_label(receiver),
                 "name": receiver.attributes["android:name"].value,
                 "process": self._get_process(receiver),
-                "permission": self._get_permission(receiver)
+                "permission": self._get_permission(receiver),
+                "intent_filters": self._intents(receiver)
             })
         return receivers
 
@@ -654,7 +660,10 @@ class module(object):
         error = "%s\n\n%s" %(traceback.format_exc(), line)
         print '%s[!] %s%s' % (R, self.to_unicode(error), N)
         self.log.error(line)
-
+        if self.avd is not None:
+            self.avd.shutdown()
+        for pid in self.subprocesses:
+                os.kill(pid+1, signal.SIGTERM)
         sys.exit(-1)
 
     def warning(self, line):
