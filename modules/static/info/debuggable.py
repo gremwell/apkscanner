@@ -22,9 +22,8 @@ class Module(framework.module):
             if a.getAttribute('android:debuggable') is not None:
                 debuggable = True if a.getAttribute('android:debuggable') == 'true' else False
 
-        if debuggable:
+        if debuggable and self.avd is not None:
             pid = 0
-
             output = self.avd.shell("ps")
             logs += "$ adb shell ps\n %s\n" % output
             for line in output.split("\n"):
@@ -36,7 +35,7 @@ class Module(framework.module):
             else:
                 logs += "$ adb forward tcp:54321 jdwp:%d\n" % pid
                 p = subprocess.Popen(
-                    "adb forward tcp:54321 jdwp:%d" % pid,
+                    "adb -s emulator-%d forward tcp:54321 jdwp:%d" % (self.avd._id, pid),
                     shell=True,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE
@@ -68,5 +67,5 @@ class Module(framework.module):
                 "The application is set to debuggable. This setting allow anyone to connect a debugger like jdb to the "
                 "running process.",
                 framework.Vulnerability.MEDIUM
-            )] if debuggable is True else []
+            ).__dict__] if debuggable is True else []
         }
