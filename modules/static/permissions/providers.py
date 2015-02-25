@@ -11,7 +11,7 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Exposed providers',
+            'Name': 'Vulnerable providers finder',
             'Author': 'Quentin Kaiser (@QKaiser)',
             'Description': 'This module gather providers information from the application manifest. It will then verify'
                            ' if these providers are correctly protected with permissions and exported values.',
@@ -46,10 +46,10 @@ class Module(framework.module):
                 for provider in providers:
                     if provider["authorities"] == match[0]:
                         provider["uris"].add("uri://%s/%s" % (match[0], match[1]))
+
         for provider in providers:
             provider["uris"] = list(provider["uris"])
 
-        for provider in providers:
             if provider["exported"] and provider["permission"] is None and provider["read_permission"] is None\
                     and provider["write_permission"] is None:
                 provider["vulnerable"] = True
@@ -58,7 +58,7 @@ class Module(framework.module):
                     "The following application provider is exported, which means that any application can access it"
                     " without the need for any custom permission.",
                     framework.Vulnerability.MEDIUM
-                ))
+                ).__dict__)
             else:
                 provider["vulnerable"] = False
 
