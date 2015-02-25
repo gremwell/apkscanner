@@ -67,10 +67,9 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'External services call check',
+            'Name': 'External services call finder',
             'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will gather information about the external services used by the application '
-                           'from the application source code.',
+            'Description': 'This module will gather information about the external services called by the application.',
             'Comments': []
         }
 
@@ -83,7 +82,7 @@ class Module(framework.module):
         external_services = set()
         for p in z:
             method = d.get_method_by_idx(p.get_src_idx())
-            if method.get_code() == None:
+            if method.get_code() is None:
                 continue
             mx = dx.get_method(method)
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
