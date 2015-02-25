@@ -21,7 +21,7 @@ class Module(framework.module):
 
         logs = ""
         vulnerabilities = []
-        results = []
+        results = {}
 
         read_permission = False
         write_permission = False
@@ -73,12 +73,18 @@ class Module(framework.module):
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
                 ms = decompile.DvMethod(mx)
                 ms.process()
-                results.append({
-                    "file": method.get_class_name()[1:-1],
-                    "line": method.get_debug().get_line_start(),
-                    "source": ms.get_source()
-                })
 
+                if method.get_class_name()[1:-1] not in results:
+                    results[method.get_class_name()[1:-1]] = []
+
+                if method.get_debug().get_line_start() not in \
+                        [x["line"] for x in results[method.get_class_name()[1:-1]]]:
+                    results[method.get_class_name()[1:-1]].append(
+                        {
+                            "source": ms.get_source(),
+                            "line": method.get_debug().get_line_start()
+                        }
+                    )
         return {
             "results": results,
             "logs": logs,
