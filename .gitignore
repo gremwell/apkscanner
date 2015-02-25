@@ -1,3 +1,7 @@
 *.pyc
+.idea
+analysis
+targets
+wiki
 env
 target
