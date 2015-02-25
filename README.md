@@ -5,6 +5,8 @@ Android application penetration testing for the masses !
 ## Install it
 
 ```
+$ git clone git@bitbucket.org:gremwell/apkscanner.git
+$ cd apkscanner
 $ virtualenv env
 $ source env/bin/activate
 $ pip install -r requirements.txt
@@ -68,9 +70,13 @@ There is no pure static or pure dynamic analysis, most of the time I confirm sta
 
 Place here a list of available modules, their purpose and how they work
 
+#### Output
+
+Describe the analysis directory, what they contain and how to use it.
+
 ### Reporting 
 	
-Still in development phase, the objective will be to generate html/pdf output with a kind of scoring system.
+Still in development phase, the objective will be to generate html/pdf output with a kind of "scoring" system.
 
 ## Credits
 
@@ -78,7 +84,7 @@ The awesome module loading code has been inspired by the one in use at [Recon-ng
 
 ## License
 
-Apache 2.0 ?
+TBD
 
 ## In progress
 
