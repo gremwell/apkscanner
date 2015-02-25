@@ -11,14 +11,13 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Webviews Javascript',
+            'Name': 'Javascript explicitly enabled webviews',
             'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will detect if the application explicitly allow javascript within webviews.',
+            'Description': 'This module will detect if the application explicitly enable javascript within webviews.',
             'Comments': [],
             'Type': 'static'
         }
 
-    #TODO: plugin regex
     def module_run(self):
 
         webviews = []
@@ -26,32 +25,31 @@ class Module(framework.module):
         d = dvm.DalvikVMFormat(self.apk.get_dex())
         dx = VMAnalysis(d)
 
-        #WebView.getSettings().setJavaScriptEnabled();
         z = dx.tainted_packages.search_methods(".", "setJavaScriptEnabled", ".")
-        #WebView.getSettings().setPluginsEnabled();
-        z += dx.tainted_packages.search_methods(".", "setPluginsEnabled", ".")
-
         for p in z:
             method = d.get_method_by_idx(p.get_src_idx())
             if method.get_code() is None:
                 continue
             mx = dx.get_method(method)
-            #if self.apk.get_package() in method.get_class_name().replace("/", "."):
             ms = decompile.DvMethod(mx)
             ms.process()
             source = ms.get_source()
-            matches = re.findall(r'setJavaScriptEnabled\((\d)\)', source)
-            if len(matches) == 1 and matches[0] == '1':
+
+            matches = re.findall(r'setJavaScriptEnabled\((1|true)\)', source)
+            if len(matches) == 1:
                 webviews.append({
                     "file": method.get_class_name()[1:-1],
-                    "line": method.get_debug().get_line_start()
+                    "line": method.get_debug().get_line_start(),
                 })
+
         return {
             "results": webviews,
             "logs": "",
             "vulnerabilities": [framework.Vulnerability(
-                "Potential XSS",
-                "",
+                "Explicitly enabled Javascript in WebViews",
+                "The application explicitly enable Javascript or Plugins for multiple webviews. This could augment "
+                "the attack surface of the application if:\n\t1) The application do not perform certificate validation/"
+                "pinning\n\t2)The content loaded through these webviews is vulnerable to cross-site scripting attacks.",
                 framework.Vulnerability.LOW
-            )] if len(webviews) is None else []
+            ).__dict__] if len(webviews) else []
         }
