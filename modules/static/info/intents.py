@@ -186,15 +186,16 @@ class Module(framework.module):
             if method.get_code() is None:
                 continue
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
-                results.append({
-                    "file": method.get_class_name()[1:-1],
-                    "line": method.get_debug().get_line_start()
-                })
                 mx = dx.get_method(method)
                 ms = decompile.DvMethod(mx)
                 ms.process()
-                #source = ms.get_source()
-                #matches = re.findall(r'Intent\(([^\)]*)\);', source)
+                source = ms.get_source()
+                matches = re.findall(r'Intent\(([^\)]*)\);', source)
+                if len(matches):
+                    results.append({
+                        "file": method.get_class_name()[1:-1],
+                        "line": method.get_debug().get_line_start(),
+                    })
 
         return {
             "results": results,
