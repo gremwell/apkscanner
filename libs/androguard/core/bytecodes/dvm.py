@@ -185,8 +185,9 @@ def readuleb128(buff) :
                 result |= (cur & 0x7f) << 21
                 if cur > 0x7f :
                     cur = ord( buff.read(1) )
-                    if cur > 0x0f :
+                    '''if cur > 0x0f :
                       warning("possible error while decoding number")
+		    '''
                     result |= cur << 28
 
     return result
