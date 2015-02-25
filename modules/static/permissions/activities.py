@@ -7,7 +7,7 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Unprotected activities',
+            'Name': 'Vulnerable activities finder',
             'Author': 'Quentin Kaiser (@QKaiser)',
             'Description': 'This module will search for unprotected activities declared in the application manifest.',
             'Comments': [
@@ -30,15 +30,15 @@ class Module(framework.module):
                                 intfilter["category"] == "android.intent.category.LAUNCHER":
                     launcher = True
 
-            if not launcher and activity["exported"] and activity["permission"] is None:
+            if not launcher and (activity["exported"] and activity["permission"] is None):
                 output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
                 logs += "$ adb shell am start -n %s/%s\n%s\n" % (self.apk.get_package(), activity["name"], output)
                 if "Error" not in output:
                     activity["vulnerable"] = True
                     vulnerabilities.append(
-                        framework.Vulnerability("Vulnerable activity component.",
+                        framework.Vulnerability("Potentially vulnerable activity component.",
                                                 "The following activities were found to be vulnerable.",
-                                                framework.Vulnerability.LOW)
+                                                framework.Vulnerability.LOW).__dict__
                     )
 
         return {
