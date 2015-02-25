@@ -10,7 +10,7 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'SQL injection',
+            'Name': 'SQL injection vector finder',
             'Author': 'Quentin Kaiser (@QKaiser)',
             'Description': 'This module will detect if the application use raw queries.',
             'Comments': [],
@@ -35,16 +35,23 @@ class Module(framework.module):
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
                 ms = decompile.DvMethod(mx)
                 ms.process()
-                results.append({
-                    "file": method.get_class_name()[1:-1],
-                    "line": method.get_debug().get_line_start()
-                })
+                if method.get_class_name()[1:-1] not in [x["file"] for x in results]:
+                    results.append({
+                        "file": method.get_class_name()[1:-1],
+                        "lines": [method.get_debug().get_line_start()]
+                    })
+                else:
+                    for r in results:
+                        if r["file"] == method.get_class_name()[1:-1]:
+                            if method.get_debug().get_line_start() not in r["lines"]:
+                                r["lines"].append(method.get_debug().get_line_start())
 
         vulnerabilities = [framework.Vulnerability(
-            "Potential SQLi",
-            "",
+            "Multiple SQL injection vectors.",
+            "The application do not make use of prepared statement which could lead to SQL injection vulnerabilities."
+            "Review the results to see if these raw queries can be exploited.",
             framework.Vulnerability.LOW
-        )] if len(results) is None else []
+        ).__dict__] if len(results) else []
 
         return {
             "results": results,
