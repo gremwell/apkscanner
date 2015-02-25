@@ -21,7 +21,7 @@ class AVD(object):
         self._port = 5554
 
     @staticmethod
-    def create(name, target, device, path=None, tag_abi="default/armeabi-v7a", skin=None, sdcard=None):
+    def create(name, target, device, path=None, tag_abi="default/armeabi", skin=None, sdcard=None):
         """
         Creates a new Android Virtual Device.
         """
@@ -39,8 +39,6 @@ class AVD(object):
             stderr=subprocess.PIPE
         )
         stdout, stderr = p.communicate()
-        if stderr:
-            raise Exception(stderr)
         return AVD(name, device, path, target, tag_abi, skin, sdcard)
 
     def move(self, name, path=None):
@@ -95,7 +93,7 @@ class AVD(object):
         else:
             return stdout
 
-    def launch(self, callback=None):
+    def launch(self, callback=None, headless=False):
         """
         Launch an Android emulator with this AVD instance.
         Params:
@@ -106,18 +104,29 @@ class AVD(object):
             if self._id is None:
                 self._id = 5554
                 while ("%d" % self._id) in subprocess.check_output(["netstat", "-an"]):
-                    self._id += 1
+                    self._id += 2
 
-            print "Started emulator-%d" % (self._id)
-            p = subprocess.Popen(["emulator", "-port", "%d" % (self._id), "-avd", self._name, "-verbose"],
-                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            p2 = subprocess.Popen(["adb", "shell", "-s", "emulator-%d" % self._id, "getprop", "init.svc.bootanim"],
-                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            while "stopped" not in p2.stdout.readline():
-                time.sleep(5)
-                p2 = subprocess.Popen(["adb", "-s", "emulator-%d" % self._id, "shell", "getprop", "init.svc.bootanim"],
-                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = subprocess.Popen(
+                "emulator -port %d -avd %s -verbose %s" %
+                (self._id, self.name, " -no-skin -no-audio -no-window" if headless else ""),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=True
+            )
+            cmd = "adb -s emulator-%d shell getprop init.svc.bootanim" % self._id
+            while "stopped" not in subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).communicate()[0]:
+                time.sleep(10)
             callback(self)
+
+    def shutdown(self):
+        """
+        :return:
+        """
+        e = Emulator("localhost", self._id)
+        if e.connect():
+            return e.kill()
+        else:
+            return None
 
     def install(self, apk):
         """
@@ -133,13 +142,39 @@ class AVD(object):
             raise Exception("AVD is not running.")
         else:
             p = subprocess.Popen(
-                "adb -s emulator-%d install %s" % (self._id, apk),
+                "adb -s emulator-%d install -r %s" % (self._id, apk),
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            stdout, stderr = p.communicate()
+            #TODO: hacky hacky
+            if stderr and not "Success" in stdout and "KB/s" not in stderr:
+                raise Exception(stderr)
+            return stdout
+
+    def uninstall(self, package):
+        """
+        Install the provided APK on the AVD.
+        Params:
+            apk(string): APK filename
+        Returns:
+            True if successful, False otherwise.
+        """
+        if self._name is None:
+            raise Exception("AVD has no name, can't install %s" % package)
+        elif not self.isrunning:
+            raise Exception("AVD is not running.")
+        else:
+            p = subprocess.Popen(
+                "adb -s emulator-%d uninstall %s" % (self._id, package),
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
             stderr, stdout = p.communicate()
             return stdout
+
 
     def remount(self):
         p = subprocess.Popen(
@@ -237,6 +272,9 @@ class AVD(object):
         Returns:
             True if successful, False otherwise
         """
+        with open(pcap_file, "wb") as f:
+            f.write("")
+
         e = Emulator("localhost", self._id)
         if e.connect():
             return e.network_capture_start(pcap_file)

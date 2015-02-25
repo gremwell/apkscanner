@@ -43,7 +43,9 @@ class Android(object):
         targets = []
         for match in matches:
             if len(match) == 8:
-                targets.append(Target(int(match[0]), match[1], match[2], match[3], int(match[4]), match[5], match[6]))
+                targets.append(
+                    Target(int(match[0]), match[1], match[2], match[3], int(match[4]), match[5], match[6], match[7].split(","))
+                )
         return targets
 
     @staticmethod

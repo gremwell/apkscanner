@@ -30,7 +30,7 @@ class Emulator(object):
 
     def _transmit(self, value):
         if self._connection is not None:
-            self._connection.write("%s\n" % value)
+            self._connection.write(("%s\n" % value).encode("ISO-8859-1"))
             return self._connection.read_until("OK", 1).replace("\r\nOK", "")
         else:
             raise Exception("Connection is closed.")
@@ -134,7 +134,6 @@ class Emulator(object):
 
     def network_capture_start(self, file):
         """dump network packets to file (the file is local to the system, not to android device)"""
-        print "network capture start %s" % file
         return self._transmit("network capture start %s" % file)
 
     def network_capture_stop(self):

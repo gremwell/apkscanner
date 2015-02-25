@@ -3,7 +3,7 @@ class Target(object):
 
     """
 
-    def __init__(self, id=0, altid=None, name=None, type=None, api_level=0, revision=None, skins=None):
+    def __init__(self, id=0, altid=None, name=None, type=None, api_level=0, revision=None, skins=None, tag_abis=None):
         super(Target, self).__init__()
         self._id = id
         self._altid = altid
@@ -12,6 +12,7 @@ class Target(object):
         self._api_level = int(api_level)
         self._revision = revision
         self._skins = skins
+        self._tag_abis = tag_abis
 
     @property
     def id(self):
@@ -69,7 +70,15 @@ class Target(object):
     def skins(self, value):
         self._skins = value
 
+    @property
+    def tag_abis(self):
+        return self._tag_abis
+
+    @tag_abis.setter
+    def tag_abis(self, value):
+        self._tag_abis = value
+
     def __str__(self):
-        return "ID: %s\nAlternative ID: %s\nName: %s\nType: %s\nAPI level: %s\nRevision: %s\nSkins: %s" % (
-            self._id, self._altid, self._name, self._type, self._api_level, self._revision, self._skins
+        return "ID: %s\nAlternative ID: %s\nName: %s\nType: %s\nAPI level: %s\nRevision: %s\nSkins: %s\nTag/ABI: %s" % (
+            self._id, self._altid, self._name, self._type, self._api_level, self._revision, self._skins, self._tag_abis
         )
