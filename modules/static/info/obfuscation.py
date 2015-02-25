@@ -21,7 +21,6 @@ class Module(framework.module):
 
     def module_run(self):
         #dexguard detection
-        #TODO: browse files recursively
         proguard = False
         for root, dirs, files in os.walk("./analysis/%s/decompiled/%s" % (
                 self.apk.get_package(), "/".join(self.apk.get_package().split(".")))):
@@ -101,5 +100,5 @@ class Module(framework.module):
                 "Lack of Code Obfuscation",
                 "",
                 framework.Vulnerability.LOW
-            )] if obfuscator is None else []
+            ).__dict__] if obfuscator is None else []
         }
