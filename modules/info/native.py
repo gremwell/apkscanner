@@ -12,12 +12,11 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Native code references search',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will detect native libraries loaded by the application and analyze those '
-                           'libraries with the "file" tool.',
-            'Comments': [],
-            'Type': 'static'
+            "Name": "Native code analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module will detect native libraries loaded by the application and analyze those "
+                           "libraries with the 'file' utility.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
