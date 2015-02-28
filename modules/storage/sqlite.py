@@ -10,11 +10,11 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         framework.module.__init__(self, apk, avd)
         self.info = {
-            'Name': 'Application local storage',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'blahblah',
-            'Comments': [],
-            'Type': 'static'
+            "Name": "Application local storage",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "Search through the application code to find SQLite related calls. Attempt to identify "
+                           "SQLite databases.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
