@@ -11,11 +11,12 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Vulnerable providers finder',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module gather providers information from the application manifest. It will then verify'
-                           ' if these providers are correctly protected with permissions and exported values.',
-            'Comments': []
+            "Name": "Content providers analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module gather content providers information from the application manifest."
+                           "It will then verify if these providers are correctly protected with permissions "
+                           "and exported values.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
