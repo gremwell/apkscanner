@@ -164,11 +164,11 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Application intents analyzer',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will extract intents creations from the code and assess to which receiver it is'
-                           'sent and which data is being transmitted.',
-            'Comments': []
+            "Name": "Application intents analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module will extract intents creations from the code and assess to which receiver it is"
+                           "sent and which data is being transmitted.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
