@@ -153,15 +153,15 @@ categories = [
 ]
 
 
-#TODO: fix key transmission fuzzing
 class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Unprotected broadcast receivers.',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': '',
-            'Comments': []
+            "Name": "Broadcast receivers analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "Identify potentially vulnerable broadcast receivers and attempt to fuzz those receivers to"
+                           "trigger errors.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
@@ -186,12 +186,14 @@ class Module(framework.module):
                     if "Broadcast completed" not in output:
 
                         logs += "$ adb shell am broadcast -a %s -c %s -n %s/%s\n%s\n" % \
-                                (intent['action'], category, self.apk.get_package(), receiver["name"], output)
+                                (intent['action'], intent["category"], self.apk.get_package(), receiver["name"], output)
                         receiver["vulnerable"] = True
                         vulnerabilities.append(
-                            framework.Vulnerability("Unprotected broadcast receiver.",
-                                            "The following broadcast receivers were found to be vulnerable.",
-                                            framework.Vulnerability.LOW).__dict__
+                            framework.Vulnerability(
+                                "Unprotected broadcast receiver.",
+                                "The following broadcast receivers were found to be vulnerable.",
+                                framework.Vulnerability.LOW
+                            ).__dict__
                         )
 
                 if not len(receiver["intent_filters"]):
@@ -206,9 +208,11 @@ class Module(framework.module):
                                         (action, category, self.apk.get_package(), receiver["name"], output)
                                 receiver["vulnerable"] = True
                                 vulnerabilities.append(
-                                    framework.Vulnerability("Unprotected broadcast receiver.",
-                                                    "The following broadcast receivers were found to be vulnerable.",
-                                                    framework.Vulnerability.LOW).__dict__
+                                    framework.Vulnerability(
+                                        "Unprotected broadcast receiver.",
+                                        "The following broadcast receivers were found to be vulnerable.",
+                                        framework.Vulnerability.LOW
+                                    ).__dict__
                                 )
 
         return {
