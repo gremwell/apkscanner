@@ -7,10 +7,10 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Vulnerable activities finder',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will search for unprotected activities declared in the application manifest.',
-            'Comments': [
+            "Name": "Activities analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module will search for unprotected activities declared in the application manifest.",
+            "Comments": [
                 "Exported activities can be launched by anyone. In the case of activities that should not be directly"
                 "accessible, this can be considered as a vulnerability."
             ]
@@ -27,7 +27,7 @@ class Module(framework.module):
             activity["vulnerable"] = False
             for intfilter in activity["intent_filters"]:
                 if intfilter["action"] == "android.intent.action.MAIN" and \
-                                intfilter["category"] == "android.intent.category.LAUNCHER":
+                        intfilter["category"] == "android.intent.category.LAUNCHER":
                     launcher = True
 
             if not launcher and (activity["exported"] and activity["permission"] is None):
