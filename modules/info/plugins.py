@@ -1,4 +1,3 @@
-# coding=utf-8
 import framework
 
 from androguard.core.bytecodes import dvm
@@ -11,12 +10,12 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Plugin explicitly enabled webviews',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will detect if the application explicitly enable plugins within webviews.',
-            'Comments': [],
-            'Type': 'static'
+            "Name": "Explicitly enabled plugin webviews finder",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module will detect if the application explicitly enable plugins within webviews.",
+            "Comments": [],
         }
+
     def module_run(self, verbose=False):
 
         webviews = []
@@ -42,6 +41,7 @@ class Module(framework.module):
                 matches = re.findall(r'setPluginsEnabled\((.*?)\)', source)
             else:
                 matches = re.findall(r'setPluginState\((.*?)\)', source)
+
             if len(matches) == 1 and "ON" in matches[0]:
                 webviews.append({
                     "file": method.get_class_name()[1:-1],
