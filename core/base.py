@@ -42,7 +42,7 @@ class category:
     INFORMATION_DISCLOSURE, SQLINJECTION = range(2)
 
 
-class AAAP(framework.module):
+class APKScanner(framework.module):
     """Main module that will instrument all submodules fromm modules directory.
 
     Help the application to perform:
@@ -52,9 +52,9 @@ class AAAP(framework.module):
         - Reporting
     """
 
-    def __init__(self, apk_filename):
+    def __init__(self, options):
         framework.module.__init__(self, None)
-        self.apk_filename = apk_filename
+        self.apk_filename = options.apk
         self.apk = None
         self.avd = None
         self.analysis = {
@@ -73,13 +73,15 @@ class AAAP(framework.module):
         self.loaded_modules = __builtin__.loaded_modules
         self.load_apk()
         self.load_modules()
+        self.static_only = options.static_only
+        self.verbose = options.verbose
 
     def on_boot(self, avd):
         self.alert("AVD is up")
         self.deploy()
 
     def deploy(self):
-        self.verbose("Installing APK...")
+        self.output("Installing APK...")
         self.avd.install(self.apk.filename)
         self.avd.remount()
         self.avd.push("./libs/busybox-android/busybox-android", "/system/xbin/busybox")
@@ -87,7 +89,7 @@ class AAAP(framework.module):
         self.avd.shell("chmod 777 /system/bin/android-remote-install.sh")
         self.avd.shell("/system/bin/android-remote-install.sh")
 
-        self.verbose("Launching application ...")
+        self.output("Launching application ...")
         for a in self.get_activities():
             if a["exported"] and len(a["intent_filters"]) and \
                             a["intent_filters"][0]["action"] == "android.intent.action.MAIN" \
@@ -95,10 +97,8 @@ class AAAP(framework.module):
                 cmd = "am start -n %s/%s" % (self.apk.get_package(), a["name"])
                 output = self.avd.shell(cmd)
 
-    def analyze(self, arguments):
+    def analyze(self, module=None):
         """
-
-        :param arguments:
         :return:
         """
         self.analysis["start_time"] = int(time.time())
@@ -107,39 +107,38 @@ class AAAP(framework.module):
         self.analysis["application"]["name"] = self.apk.filename
         self.analysis["application"]["size"] = os.path.getsize(self.apk.filename)
 
-        logcat_pid1 = 0
-        logcat_pid2 = 0
-
         self.fry()
-        if not arguments.static_only:
-            self.verbose("Searching AVD ...")
+        if not self.static_only:
+            self.output("Searching AVD ...")
             self.avd = self.find_avd()
-            self.verbose("AVD found")
+            self.output("AVD found")
             if not self.avd.isrunning:
-                self.verbose("Launching AVD")
+                self.output("Launching AVD")
                 self.avd.launch(self.on_boot, headless=True)
             else:
                 self.deploy()
 
-            self.verbose("Setting up logcat logger...")
+            self.output("Setting up logcat logger...")
             self.subprocesses.append(self.avd.logcat("analysis/%s/logcat_pkg.log" % self.apk.get_package(), tag=self.apk.get_package()))
             self.subprocesses.append(self.avd.logcat("analysis/%s/logcat_full.log" % self.apk.get_package(), tag=None))
-            self.verbose("Launching network capture ...")
+            self.output("Launching network capture ...")
             self.avd.start_traffic_capture("analysis/%s/capture_%d.pcap" % (self.apk.get_package(), int(time.time())))
 
         try:
-            if arguments.module is not None:
-                modules = [x for x in self.loaded_modules if x == arguments.module and x.startswith("static")]
-            else:
-                modules = [x for x in self.loaded_modules if x.startswith("static")]
+            modules = self.loaded_modules
+            if module is not None:
+                if module in self.loaded_modules:
+                    modules = [x for x in self.loaded_modules if x == module]
+                else:
+                    self.error("This module do not exists.")
 
             for k in modules:
                 m = sys.modules[self.loaded_modules[k]].Module(self.apk, self.avd)
-                self.verbose("Running %s ..." % (m.info['Name']))
+                self.output("Running %s ..." % (m.info['Name']))
                 r = {
                     "start_time": int(time.time()),
                     "name": m.info["Name"],
-                    "run": m.module_run(),
+                    "run": m.module_run(verbose=self.verbose),
                     "end_time": int(time.time())
                 }
                 for v in r["run"]["vulnerabilities"]:
@@ -159,11 +158,11 @@ class AAAP(framework.module):
 
             for pid in self.subprocesses:
                 os.kill(pid+1, signal.SIGTERM)
-            self.verbose("Stopping network capture ...")
+            self.output("Stopping network capture ...")
             self.avd.stop_traffic_capture()
-            self.verbose("Uninstalling APK ...")
+            self.output("Uninstalling APK ...")
             print self.avd.uninstall(self.apk.get_package())
-            #self.verbose("Shutting down AVD...")
+            #self.output("Shutting down AVD...")
             #self.avd.shutdown()
         self.analysis["end_time"] = int(time.time())
         self.report()
@@ -173,15 +172,18 @@ class AAAP(framework.module):
             Load the APK with Androguard.
         """
         try:
-            if androconf.is_android(self.apk_filename) == "APK":
-                a = apk.APK(self.apk_filename, zipmodule=2)
-                if a.is_valid_APK():
-                    self.apk = a
-                    self.manifest = self.apk.get_android_manifest_xml().getElementsByTagName("manifest")[0]
+            if not os.path.exists(self.apk_filename):
+                self.error("The APK file do not exists")
+            else:
+                if androconf.is_android(self.apk_filename) == "APK":
+                    a = apk.APK(self.apk_filename, zipmodule=2)
+                    if a.is_valid_APK():
+                        self.apk = a
+                        self.manifest = self.apk.get_android_manifest_xml().getElementsByTagName("manifest")[0]
+                    else:
+                        self.error("The APK file you provided is not valid.")
                 else:
                     self.error("The APK file you provided is not valid.")
-            else:
-                self.error("The APK file you provided is not valid.")
         except Exception as e:
             self.error(str(e))
 
@@ -212,7 +214,7 @@ class AAAP(framework.module):
             Exception
         """
         try:
-            self.verbose("Building analysis directory ...")
+            self.output("Building analysis directory ...")
             if not os.path.exists("./analysis/%s" % self.apk.get_package()):
                 os.mkdir("./analysis/%s" % self.apk.get_package())
 
@@ -221,11 +223,11 @@ class AAAP(framework.module):
                 if not os.path.exists("./analysis/%s/%s" % (self.apk.get_package(), d)):
                     os.mkdir("./analysis/%s/%s" % (self.apk.get_package(), d))
 
-            self.verbose("Unzipping APK file ...")
+            self.output("Unzipping APK file ...")
             with ZipFile(self.apk.get_filename()) as zipapk:
                 zipapk.extractall("./analysis/%s/orig" % (self.apk.get_package()))
 
-            self.verbose("Converting DEX to JAR ...")
+            self.output("Converting DEX to JAR ...")
             p = subprocess.Popen(
                 './libs/dex2jar/dex2jar ./analysis/%s/orig/classes.dex -f -o ./analysis/%s/jar/classes.jar  1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
@@ -237,7 +239,7 @@ class AAAP(framework.module):
             if len(stderr):
                 self.error(stderr)
 
-            self.verbose("Converting DEX to SMALI ...")
+            self.output("Converting DEX to SMALI ...")
             p = subprocess.Popen(
                 './libs/baksmali ./analysis/%s/orig/classes.dex -o ./analysis/%s/smali 1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
@@ -249,7 +251,7 @@ class AAAP(framework.module):
             if len(stderr):
                 self.error(stderr)
 
-            self.verbose("Decompiling JAR file ...")
+            self.output("Decompiling JAR file ...")
             p = subprocess.Popen(
                 './libs/jd ./analysis/%s/jar/classes.jar -od ./analysis/%s/decompiled 1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
@@ -261,9 +263,7 @@ class AAAP(framework.module):
             if len(stderr):
                 self.error(stderr)
 
-            #TODO: may be an overhead but apktool is the only valid tool that is able to decipher these fucking
-            #binary xml values.
-            self.verbose("Converting Application Manifest to human readable format ...")
+            self.output("Converting Application Manifest to human readable format ...")
             with open("./analysis/%s/orig/AndroidManifest.xml" % self.apk.get_package(), "w") as f:
                 f.write(self.apk.get_android_manifest_xml().toprettyxml().decode('utf-8'))
 
@@ -293,7 +293,7 @@ class AAAP(framework.module):
         dest = "./analysis/%s/device/data/data" % self.apk.get_package()
         avd.pull(source, dest)
 
-        self.verbose("Teleporting data ...")
+        self.output("Teleporting data ...")
 
         #search files owned by the application's user (u0_a46) in the sdcard mount point.
         #1. get application UID
@@ -305,8 +305,8 @@ class AAAP(framework.module):
                     uid = int(line.split(" ")[1])
 
         if uid is not None:
-            self.verbose("Found application UID : %d" % uid)
-            self.verbose("Searching for files owned by user %d" % uid)
+            self.output("Found application UID : %d" % uid)
+            self.output("Searching for files owned by user %d" % uid)
             files = avd.shell("find /sdcard -type f -user %d" % uid)
             for f in [x for x in files.split("\n") if len(x)]:
                 print avd.pull(f, "./analysis/%s/device/sdcard" % self.apk.get_package())
