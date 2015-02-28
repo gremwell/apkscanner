@@ -10,10 +10,11 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         framework.module.__init__(self, apk, avd)
         self.info = {
-            'Name': 'Application shared preferences checker',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'blahblah',
-            'Comments': []
+            "Name": "Shared preferences analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module will search through the application source code for function calls related to "
+                           "shared preferences.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
