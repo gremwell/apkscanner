@@ -657,7 +657,8 @@ class module(object):
 
     def error(self, line):
         '''Formats and presents errors.'''
-        error = "%s\n\n%s" %(traceback.format_exc(), line)
+        #TODO: stupid error handling here.
+        error = "%s\n\n%s" % (traceback.format_exc(), line)
         print '%s[!] %s%s' % (R, self.to_unicode(error), N)
         self.log.error(line)
         if self.avd is not None:
@@ -680,7 +681,3 @@ class module(object):
         '''Formats and presents important output.'''
         print '%s[*]%s %s' % (G, N, self.to_unicode(line))
         self.log.info(line)
-
-    def verbose(self, line):
-        '''Formats and presents output if in verbose mode.'''
-        self.output(line)
