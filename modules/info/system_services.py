@@ -67,10 +67,10 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'External services call finder',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will gather information about the external services called by the application.',
-            'Comments': []
+            "Name": "System services call finder",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module will gather information about the external services called by the application.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
