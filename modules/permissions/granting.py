@@ -279,12 +279,12 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         framework.module.__init__(self, apk, avd)
         self.info = {
-            'Name': 'Permissions undergranting checker',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module compares the permissions asked by the application in the application manifest '
-                           'and the permissions actually used by the application to detect undergranting or overgranting'
-                           'of permission situations.',
-            'Comments': [
+            "Name": "Permissions granting analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module compares the permissions asked by the application in the application manifest "
+                           "and the permissions actually used by the application to detect undergranting or overgranting"
+                           "of permission.",
+            "Comments": [
                 "Right now, this module is only checking android.permissions permissions and not application defined"
                 " permissions."
             ]
