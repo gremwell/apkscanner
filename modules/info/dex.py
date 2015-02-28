@@ -11,10 +11,10 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'External DEX loading analyzer',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This modules analyze the application for DEX files sideloading.',
-            'Comments': []
+            "Name": "DEX sideloading finder",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This modules analyze the application for DEX files sideloading.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
@@ -49,7 +49,7 @@ class Module(framework.module):
                     )
 
         if verbose and len(results):
-            self.output("The application sideload dex files.")
+            print "The application sideload dex files."
 
         return {
             "results": results,
