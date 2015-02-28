@@ -5,11 +5,11 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Exposed services checker',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will gather information about the services used by the application from the '
-                           'application manifest. It will detect unprotected services from that information.',
-            'Comments': []
+            "Name": "Services analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module will gather information about the services used by the application from the "
+                           "application manifest. It will detect unprotected services from that information.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
@@ -24,9 +24,11 @@ class Module(framework.module):
                 if "Error: Not found; no service started." not in output:
                     service["vulnerable"] = True
                     vulnerabilities.append(
-                        framework.Vulnerability("Potentially vulnerable service component.",
-                                                "The following services were found to be vulnerable.",
-                                                framework.Vulnerability.LOW).__dict__
+                        framework.Vulnerability(
+                            "Potentially vulnerable service component.",
+                            "The following services were found to be vulnerable.",
+                            framework.Vulnerability.LOW
+                        ).__dict__
                     )
                     output = self.avd.shell("am force-stop %s" % (self.apk.get_package()))
                     logs += "adb shell am force-stop %s \n%s" % (self.apk.get_package(), output)
