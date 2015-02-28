@@ -71,21 +71,16 @@ class Module(framework.module):
 
         vulnerabilities = []
 
-        try:
-            d = datetime.datetime.strptime(result["not_after"], "%Y-%m-%dT%H:%M:%S+00:00")
-            t = calendar.timegm(d.timetuple())
-            if t < int(time.time()):
-                vulnerabilities.append(
-                    framework.Vulnerability(
-                        "Certificate has expired.",
-                        "The application certificate has expired.",
-                        framework.Vulnerability.LOW
-                    ).__dict__
-                )
-        except ValueError:
-            result["not_before"] = "Invalid format"
-            result["not_after"] = "Invalid format"
-            pass
+        d = datetime.datetime.strptime(result["not_after"], "%b %d %H:%M:%S %Y %Z")
+        t = calendar.timegm(d.timetuple())
+        if t < int(time.time()):
+            vulnerabilities.append(
+                framework.Vulnerability(
+                    "Certificate has expired.",
+                    "The application certificate has expired.",
+                    framework.Vulnerability.LOW
+                ).__dict__
+            )
 
         if result is not None and result["verified"] is False:
             vulnerabilities.append(
