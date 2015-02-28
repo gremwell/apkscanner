@@ -11,16 +11,16 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Obfuscation detector',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will detect if an obfuscation tool like Proguard or DexGuard has been used'
-                           'by the application developer.',
-            'Comments': [],
-            'Type': 'static'
+            "Name": "Obfuscation detector",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This module will detect if the application code has been obfuscated with tools like "
+                           "Proguard, DexGuard or APKProtect.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
-        #dexguard detection
+
+        #proguard detection
         proguard = False
         for root, dirs, files in os.walk("./analysis/%s/decompiled/%s" % (
                 self.apk.get_package(), "/".join(self.apk.get_package().split(".")))):
@@ -95,7 +95,7 @@ class Module(framework.module):
             obfuscator = None
 
         if verbose and obfuscator is not None:
-            self.output("Obfuscator : %s" % obfuscator)
+            print "Obfuscator : %s" % obfuscator
 
         return {
             "results": obfuscator,
