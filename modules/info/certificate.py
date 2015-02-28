@@ -11,11 +11,11 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Application certificate validation',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will extract information from the application certificate in a human readable'
-                           'format and attempt to verify it.',
-            'Comments': [
+            "Name": "Application certificate validator",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "Parse the application's certificate to extract informations "
+                           "and xecute certificate validation.",
+            "Comments": [
                 "This module rely on M2Crypto for certificate manipulation."
             ]
         }
