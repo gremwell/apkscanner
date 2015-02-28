@@ -2,16 +2,16 @@ import framework
 
 import subprocess
 
+
 class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Debuggable value check',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will check if the debuggable value within the application manifest is set to'
-                           'true or false.',
-            'Comments': [],
-            'Type': 'static'
+            "Name": "Application's debuggable bit verifier",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "Check if the debuggable value within the application manifest is set to"
+                           "true or false. If launched in dynamic mode, attempt to confirm with jdb.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
@@ -29,10 +29,12 @@ class Module(framework.module):
             for activity in activities:
                 for intfilter in activity["intent_filters"]:
                     if intfilter["action"] == "android.intent.action.MAIN" and \
-                                    intfilter["category"] == "android.intent.category.LAUNCHER":
+                            intfilter["category"] == "android.intent.category.LAUNCHER":
                         output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
                         logs += "$ adb shell am start -n %s/%s\n%s\n" % (self.apk.get_package(), activity["name"], output)
                         break
+
+            #find application's process
             pid = 0
             output = self.avd.shell("ps | grep %s" % self.apk.get_package())
             logs += "$ adb shell ps | grep %s\n %s\n" % (self.apk.get_package(), output)
@@ -43,6 +45,7 @@ class Module(framework.module):
             if pid is None:
                 self.error("The application is not running. Can't confirm debuggable status.")
             else:
+                #forward jdwp and connect remotely with jdb
                 logs += "$ adb forward tcp:54321 jdwp:%d\n" % pid
                 p = subprocess.Popen(
                     "adb -s emulator-%d forward tcp:54321 jdwp:%d" % (self.avd._id, pid),
@@ -69,7 +72,9 @@ class Module(framework.module):
                         if "Unable to attach to target VM." in stdout:
                             debuggable = False
 
-        print logs
+        if verbose:
+            print logs
+
         return {
             "results": debuggable,
             "logs": logs,
