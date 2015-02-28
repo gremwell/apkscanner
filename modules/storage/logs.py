@@ -11,11 +11,11 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Application logs analyzer',
-            'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This modules extracts calls to the Android logger to obtain information being logged from'
-                           'a static analysis point of view.',
-            'Comments': []
+            "Name": "Logging analyzer",
+            "Author": "Quentin Kaiser (@QKaiser)",
+            "Description": "This modules extracts calls to the Android logger to obtain information being logged from"
+                           "a static analysis point of view.",
+            "Comments": []
         }
 
     def module_run(self, verbose=False):
