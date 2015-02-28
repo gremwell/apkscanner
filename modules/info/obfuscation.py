@@ -19,7 +19,7 @@ class Module(framework.module):
             'Type': 'static'
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
         #dexguard detection
         proguard = False
         for root, dirs, files in os.walk("./analysis/%s/decompiled/%s" % (
@@ -93,6 +93,10 @@ class Module(framework.module):
             obfuscator = "APKProtect"
         else:
             obfuscator = None
+
+        if verbose and obfuscator is not None:
+            self.output("Obfuscator : %s" % obfuscator)
+
         return {
             "results": obfuscator,
             "logs": "",

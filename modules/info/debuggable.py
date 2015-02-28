@@ -14,7 +14,7 @@ class Module(framework.module):
             'Type': 'static'
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
         logs = ""
         xml = self.apk.get_android_manifest_xml()
         debuggable = False
@@ -23,9 +23,19 @@ class Module(framework.module):
                 debuggable = True if a.getAttribute('android:debuggable') == 'true' else False
 
         if debuggable and self.avd is not None:
+
+            #launch the app
+            activities = self.get_activities()
+            for activity in activities:
+                for intfilter in activity["intent_filters"]:
+                    if intfilter["action"] == "android.intent.action.MAIN" and \
+                                    intfilter["category"] == "android.intent.category.LAUNCHER":
+                        output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
+                        logs += "$ adb shell am start -n %s/%s\n%s\n" % (self.apk.get_package(), activity["name"], output)
+                        break
             pid = 0
-            output = self.avd.shell("ps")
-            logs += "$ adb shell ps\n %s\n" % output
+            output = self.avd.shell("ps | grep %s" % self.apk.get_package())
+            logs += "$ adb shell ps | grep %s\n %s\n" % (self.apk.get_package(), output)
             for line in output.split("\n"):
                 s = line.split()
                 if len(s) == 9 and s[8] == self.apk.get_package():
@@ -59,6 +69,7 @@ class Module(framework.module):
                         if "Unable to attach to target VM." in stdout:
                             debuggable = False
 
+        print logs
         return {
             "results": debuggable,
             "logs": logs,

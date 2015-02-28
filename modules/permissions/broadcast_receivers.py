@@ -1,13 +1,6 @@
-__author__ = 'quentin'
-
 import framework
 
-import re
-from androguard.core.bytecodes import dvm
-from androguard.core.analysis.analysis import *
-from androguard.decompiler.dad import decompile
-
-android_intent_constants = [
+actions = [
     "android.intent.action.MAIN",
     "android.intent.action.VIEW",
     "android.intent.action.ATTACH_DATA",
@@ -107,7 +100,7 @@ android_intent_constants = [
     "android.intent.action.PRE_BOOT_COMPLETED"
 ]
 
-android_intent_extras = [
+extras = [
     "android.intent.extra.shortcut.INTENT",
     "android.intent.extra.shortcut.NAME",
     "android.intent.extra.shortcut.ICON",
@@ -136,7 +129,7 @@ android_intent_extras = [
     "android.intent.extra.INSTALLER_PACKAGE_NAME"
 ]
 
-android_intent_categories = [
+categories = [
     "android.intent.category.DEFAULT",
     "android.intent.category.BROWSABLE",
     "android.intent.category.ALTERNATIVE",
@@ -160,45 +153,66 @@ android_intent_categories = [
 ]
 
 
+#TODO: fix key transmission fuzzing
 class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Application intents analyzer',
+            'Name': 'Unprotected broadcast receivers.',
             'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This module will extract intents creations from the code and assess to which receiver it is'
-                           'sent and which data is being transmitted.',
+            'Description': '',
             'Comments': []
         }
 
-    def module_run(self):
-
+    def module_run(self, verbose=False):
         logs = ""
         vulnerabilities = []
-        results = []
+        receivers = self.get_receivers()
 
-        d = dvm.DalvikVMFormat(self.apk.get_dex())
-        dx = VMAnalysis(d)
-        z = dx.tainted_packages.search_methods("Landroid/content/Intent", "<init>", ".")
+        #for each action by categories, send intent and see what happen
+        for receiver in receivers:
+            receiver["vulnerable"] = False
+            if receiver["exported"] and receiver["permission"] is None:
+                #1. Get exposed broadcast receivers from results
+                for intent in receiver["intent_filters"]:
+                    if intent['category'] is not None:
+                        output = self.avd.shell("am broadcast -a %s -c %s -n %s/%s" %
+                                                (intent['action'], intent['category'],
+                                                 self.apk.get_package(), receiver["name"]))
+                    else:
+                        output = self.avd.shell("am broadcast -a %s -n %s/%s" %
+                                                (intent['action'], self.apk.get_package(), receiver["name"]))
 
-        for p in z:
-            method = d.get_method_by_idx(p.get_src_idx())
-            if method.get_code() is None:
-                continue
-            if self.apk.get_package() in method.get_class_name().replace("/", "."):
-                mx = dx.get_method(method)
-                ms = decompile.DvMethod(mx)
-                ms.process()
-                source = ms.get_source()
-                matches = re.findall(r'Intent\(([^\)]*)\);', source)
-                if len(matches):
-                    results.append({
-                        "file": method.get_class_name()[1:-1],
-                        "line": method.get_debug().get_line_start(),
-                    })
+                    if "Broadcast completed" not in output:
+
+                        logs += "$ adb shell am broadcast -a %s -c %s -n %s/%s\n%s\n" % \
+                                (intent['action'], category, self.apk.get_package(), receiver["name"], output)
+                        receiver["vulnerable"] = True
+                        vulnerabilities.append(
+                            framework.Vulnerability("Unprotected broadcast receiver.",
+                                            "The following broadcast receivers were found to be vulnerable.",
+                                            framework.Vulnerability.LOW).__dict__
+                        )
+
+                if not len(receiver["intent_filters"]):
+                    for category in categories:
+                        for action in actions:
+                            #2. Fuzz receivers with a set of intents (Null intents, malformed, ...)
+                            output = self.avd.shell("am broadcast -a %s -c %s -n %s/%s" %
+                                                    (action, category, self.apk.get_package(), receiver["name"]))
+                            if "Broadcast completed" not in output:
+                                print output
+                                logs += "$ adb shell am broadcast -a %s -c %s -n %s/%s\n%s\n" % \
+                                        (action, category, self.apk.get_package(), receiver["name"], output)
+                                receiver["vulnerable"] = True
+                                vulnerabilities.append(
+                                    framework.Vulnerability("Unprotected broadcast receiver.",
+                                                    "The following broadcast receivers were found to be vulnerable.",
+                                                    framework.Vulnerability.LOW).__dict__
+                                )
 
         return {
-            "results": results,
+            "results": receivers,
             "logs": logs,
             "vulnerabilities": vulnerabilities
         }

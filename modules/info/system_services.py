@@ -73,7 +73,7 @@ class Module(framework.module):
             'Comments': []
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
         dx = VMAnalysis(d)

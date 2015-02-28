@@ -17,7 +17,7 @@ class Module(framework.module):
             'Comments': [],
             'Type': 'static'
         }
-    def module_run(self):
+    def module_run(self, verbose=False):
 
         webviews = []
 

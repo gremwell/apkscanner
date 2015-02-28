@@ -20,7 +20,7 @@ class Module(framework.module):
             'Type': 'static'
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
 
         logs = ""
         vulnerabilities = []
@@ -43,7 +43,6 @@ class Module(framework.module):
             matches = re.findall(r'System\.loadLibrary\("([^"]*)"\)', source)
             if len(matches):
                 for m in matches:
-                    # TODO: any other supported archs with android ?
                     for arch in ["armeabi", "armeabiv7", "x86"]:
                         path = "./analysis/%s/orig/lib/%s/lib%s.so" % (self.apk.get_package(), arch, m)
                         if path not in [x["path"] for x in libs]:
@@ -55,9 +54,11 @@ class Module(framework.module):
                                     stderr=subprocess.PIPE
                                 )
                                 stdout, stderr = p.communicate()
+                                logs += "$ file %s\n%s\n" % (os.path.abspath(path), stdout if not stderr else stderr)
                                 libs.append(
                                     {
                                         "name": m,
+                                        "arch": arch,
                                         "path": path,
                                         "info": stdout if not stderr else stderr,
                                         "references": [
@@ -77,8 +78,11 @@ class Module(framework.module):
                                             "line": method.get_debug().get_line_start()
                                         }
                                     )
-        if not len(libs):
-            self.verbose("No native libs found.")
+        if verbose:
+            for lib in libs:
+                print "%s [%s] - %s" % (lib["name"], lib["arch"], lib["path"])
+            print "\n%s" % logs
+
         return {
             "results": libs,
             "logs": logs,

@@ -12,7 +12,7 @@ class Module(framework.module):
             'Comments': []
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
         services = self.get_services()
         vulnerabilities = []
         logs = ""

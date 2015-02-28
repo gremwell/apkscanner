@@ -17,7 +17,7 @@ class Module(framework.module):
             'Comments': []
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
 
         logs = ""
         vulnerabilities = []

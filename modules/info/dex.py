@@ -11,14 +11,13 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            'Name': 'Application logs analyzer',
+            'Name': 'External DEX loading analyzer',
             'Author': 'Quentin Kaiser (@QKaiser)',
-            'Description': 'This modules extracts calls to the Android logger to obtain information being logged from'
-                           'a static analysis point of view.',
+            'Description': 'This modules analyze the application for DEX files sideloading.',
             'Comments': []
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
 
         logs = ""
         vulnerabilities = []
@@ -26,9 +25,10 @@ class Module(framework.module):
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
         dx = VMAnalysis(d)
-        z = dx.tainted_packages.search_packages("Log")
+        z = dx.tainted_packages.search_packages("DexClassLoader")
         for p in z:
             method = d.get_method_by_idx(p.get_src_idx())
+
             if self.apk.package.replace(".", "/") in method.get_class_name()[1:-1]:
                 if method.get_code() is None:
                     continue
@@ -47,6 +47,9 @@ class Module(framework.module):
                             "line": method.get_debug().get_line_start()
                         }
                     )
+
+        if verbose and len(results):
+            self.output("The application sideload dex files.")
 
         return {
             "results": results,

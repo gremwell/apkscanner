@@ -19,7 +19,7 @@ class Module(framework.module):
             ]
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
 
         info = {
             'package_name': self.apk.package,
@@ -54,7 +54,6 @@ class Module(framework.module):
         info['hashes']['sha256'] = sha256.hexdigest()
 
         try:
-            # Content in English
             url = "https://play.google.com/store/apps/details?id=%s&hl=en" % str(self.apk.package)
 
             req = urllib2.Request(url)
@@ -78,6 +77,12 @@ class Module(framework.module):
         except urllib2.URLError:
             self.warning("Network is down")
             pass
+
+        if verbose:
+            print "\nName: %s\nPackage: %s\nDescription: %s\nPlatform: %s\nSize: %s\n\nMD5: %s\nSHA1: %s" % (
+                info["name"], info["package_name"], info["platform"]["name"], info["description"], info["size"], info["hashes"]["md5"],
+                info["hashes"]["sha1"]
+            )
 
         return {
             "results": info,

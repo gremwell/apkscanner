@@ -18,7 +18,7 @@ class Module(framework.module):
             'Type': 'static'
         }
 
-    def module_run(self):
+    def module_run(self, verbose=False):
 
         webviews = []
 
