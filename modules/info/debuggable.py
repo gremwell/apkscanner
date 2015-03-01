@@ -59,7 +59,7 @@ class Module(framework.module):
                 else:
 
                     p = subprocess.Popen(
-                        "echo 'classes' | jdb -attach localhost:54321",
+                        "echo 'classes' | jdb -attach localhost:54321 | grep %s" % self.apk.get_package(),
                         shell=True,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE
