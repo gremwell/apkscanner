@@ -6,6 +6,8 @@ from androguard.core.analysis.analysis import *
 from androguard.decompiler.dad import decompile
 import re
 import os
+from shutil import copy
+import fnmatch
 
 
 class Module(framework.module):
@@ -25,6 +27,9 @@ class Module(framework.module):
         vulnerabilities = []
         libs = []
 
+        if not os.path.exists("./analysis/%s/native" % self.apk.get_package()):
+                os.mkdir("./analysis/%s/native" % self.apk.get_package())
+            
         d = dvm.DalvikVMFormat(self.apk.get_dex())
         dx = VMAnalysis(d)
         z = dx.tainted_packages.search_methods(".", "loadLibrary", ".")
@@ -40,12 +45,46 @@ class Module(framework.module):
             ms.process()
             source = ms.get_source()
             matches = re.findall(r'System\.loadLibrary\("([^"]*)"\)', source)
+
             if len(matches):
                 for m in matches:
-                    for arch in ["armeabi", "armeabiv7", "x86"]:
+                    for arch in ["armeabi", "armeabiv7", "x86", "mipsel"]:
                         path = "./analysis/%s/orig/lib/%s/lib%s.so" % (self.apk.get_package(), arch, m)
                         if path not in [x["path"] for x in libs]:
                             if os.path.exists(path):
+                                copy(path, "./analysis/%s/native" % self.apk.get_package())
+
+                                ndk_path = None
+                                for p in os.environ["PATH"].split(":"):
+                                    if os.path.exists(os.path.join(p, "ndk-build")):
+                                        ndk_path = p
+                                        break
+
+                                objdump_bin = None
+                                if ndk_path is not None:
+                                    for root, dirs, files in os.walk(ndk_path):
+                                        for basename in files:
+                                            if fnmatch.fnmatch(basename, "objdump"):
+                                                filename = os.path.join(root, basename)
+                                                _arch = "arm" if arch in ("armeabi", "armeabiv7") else arch
+                                                if _arch in filename:
+                                                    objdump_bin = filename
+                                                    break
+
+                                if objdump_bin is not None:
+                                    objdump_outfile = "./analysis/%s/native/lib%s.objdump" % (self.apk.get_package(), m)
+                                    with open(objdump_outfile, "wb") as f:
+                                        exitcode = subprocess.call("%s -D %s" % (objdump_bin, os.path.abspath(path)),
+                                                               shell=True,
+                                                               stdout=f,
+                                                               stderr=subprocess.PIPE
+                                        )
+                                        if exitcode:
+                                            raise Exception("An error occured when running objdump on %s" % path)
+                                        else:
+                                            logs += "$ %s %s > %s\n" % \
+                                                    (objdump_bin, os.path.abspath(path), objdump_outfile)
+
                                 p = subprocess.Popen(
                                     "file %s" % os.path.abspath(path),
                                     shell=True,
