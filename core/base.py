@@ -115,11 +115,11 @@ class APKScanner(framework.module):
         if not self.static_only:
             self.output("Searching AVD ...")
             self.avd = self.find_avd()
-            self.output("AVD found [emulator-%d running %s]" % (self.avd._id, self.avd.name))
             if not self.avd.isrunning:
-                self.output("Launching AVD")
+                self.output("Launching new emulator [%s]" % self.avd.name)
                 self.avd.launch(self.on_boot, headless=True)
             else:
+                self.output("AVD found [emulator-%d running %s]" % (self.avd._id, self.avd.name))
                 self.deploy()
 
             if not os.path.exists("analysis/%s/" % self.apk.get_package()):
@@ -172,7 +172,8 @@ class APKScanner(framework.module):
             #self.output("Shutting down AVD...")
             #self.avd.shutdown()
         self.analysis["end_time"] = int(time.time())
-        self.report()
+
+
 
     def load_apk(self):
         """
@@ -216,7 +217,7 @@ class APKScanner(framework.module):
             html_out = template.render(data=self.analysis)
             with codecs.open("report.html", "w", "utf-8") as f:
                 f.write(html_out)
-                HTML(string=html_out).write_pdf("report.pdf", stylesheets=["templates/dist/css/bootstrap.min.css"])
+                HTML(string=html_out).write_pdf("report.pdf", stylesheets=["reporting/templates/dist/css/bootstrap.min.css"])
             return
         else:
             raise Exception("Unsupported report format.")
