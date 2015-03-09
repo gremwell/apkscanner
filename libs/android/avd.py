@@ -291,6 +291,20 @@ class AVD(object):
         else:
             raise Exception("An error occured while connecting to the device.")
 
+    def screenshot(self, filename=None):
+        """
+        Take a screenshot and save it to filename
+        :return:
+        """
+        if filename is None:
+            filename = "/tmp/%d_%d.png"%(self._id, int(time.time()))
+        self.shell("screencap -p /sdcard/screen.png")
+        self.pull("/sdcard/screen.png", filename)
+        self.shell("rm /sdcard/screen.png")
+        return 1
+
+    def unlock(self):
+        self.shell("input keyevent 82")
 
     @property
     def name(self):
