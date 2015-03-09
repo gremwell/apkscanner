@@ -137,7 +137,7 @@ class module(object):
 
     def get_permissions(self):
         permissions = []
-        for permission in self.manifest.getElementsByTagName("permission"):
+        for permission in self.manifest.getElementsByTagName("uses-permission"):
             permissions.append(permission.attributes["android:name"].value)
         return permissions
 
