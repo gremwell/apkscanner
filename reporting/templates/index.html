@@ -1,200 +1,528 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <title>Android Application Blackbox Testing Framework</title>
-    <meta name="generator" content="Android Application Blackbox Testing Framework"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href='http://fonts.googleapis.com/css?family=Raleway:400,200' rel='stylesheet' type='text/css'>
-    <!--[if lt IE 9]>
-    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link href="dist/css/styles.css" rel="stylesheet">
-    <style>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>Bootstrap 3 Admin</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="templates/dist/css/bootstrap.min.css" rel="stylesheet">
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="templates/dist/css/styles.css" rel="stylesheet">
+	</head>
+	<body>
+<!-- Header -->
+<div id="top-nav" class="navbar navbar-inverse navbar-static-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data["modules"]-toggle="collapse" data["modules"]-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Dashboard</a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        
+        <li class="dropdown">
+          <a class="dropdown-toggle" role="button" data["modules"]-toggle="dropdown" href="#"><i class="glyphicon glyphicon-user"></i> Admin <span class="caret"></span></a>
+          <ul id="g-account-menu" class="dropdown-menu" role="menu">
+            <li><a href="#">My Profile</a></li>
+          </ul>
+        </li>
+        <li><a href="#"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>
+      </ul>
+    </div>
+  </div><!-- /container -->
+</div>
+<!-- /Header -->
 
-        .header{
-        margin-left:10%;
-        margin-top:10px;
-        margin-bottom:20px;
-        }
+<!-- Main -->
+<div class="container-fluid">
+<div class="row">
+	<div class="col-sm-3">
+      <!-- Left column -->
+      <a href="#"><strong><i class="glyphicon glyphicon-wrench"></i>Static Analysis</strong></a>  
+       <ul class="nav nav-pills nav-stacked">
+        <li class="nav-header"></li>   
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Informations</a></li> 
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Intents</a></li> 
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Logs</a></li> 
+	 <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Permissions</a></li> 
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Providers</a></li>
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Receivers</a></li>
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Services</a></li> 
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Search</a></li>
+	</ul>
+	 
+     <hr>
+      <a href="#"><strong><i class="glyphicon glyphicon-wrench"></i></strong></a>
+       <ul class="nav nav-pills nav-stacked">
+        <li class="nav-header"></li>   
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> All files</a></li>
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Manifest</a></li>
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Resources</a></li>
+	</ul>
 
-        .picture{
-        height:150px;
-        width:150px;
-        position:absolute;
-        margin-top:10px;
-        }
-        @media (max-width: 767px) {
-        .header{
-        text-align : center;
-        }
-        .nav{
-        margin-top : 30px;
-        }
-        }
+    <hr>
+      <a href="#"><strong><i class="glyphicon glyphicon-wrench"></i>Dynamic Analysis</strong></a>
+       <ul class="nav nav-pills nav-stacked">
+        <li class="nav-header"></li>
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Traffic</a></li>
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Files</a></li>
+	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Database</a></li>
+	 <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Crypto</a></li>
+	</ul>
 
-        .error-notice {
-        margin: 5px 5px; /* Making sure to keep some distance from all side */
-        }
-
-        .oaerror {
-        margin: 0 auto; /* Centering Stuff */
-        background-color: #FFFFFF; /* Default background */
-        padding: 20px;
-        border: 1px solid #eee;
-        border-left-width: 5px;
-        border-radius: 3px;
-        margin: 0 auto;
-        font-family: 'Open Sans', sans-serif;
-        font-size: 16px;
-        }
-
-        .danger {
-        border-left-color: #d9534f; /* Left side border color */
-        background-color: rgba(217, 83, 79, 0.1); /* Same color as the left border with reduced alpha to 0.1 */
-        }
-
-        .danger strong {
-        color: #d9534f;
-        }
-
-        .warning {
-        border-left-color: #f0ad4e;
-        background-color: rgba(240, 173, 78, 0.1);
-        }
-
-        .warning strong {
-        color: #f0ad4e;
-        }
-
-        .info {
-        border-left-color: #5bc0de;
-        background-color: rgba(91, 192, 222, 0.1);
-        }
-
-        .info strong {
-        color: #5bc0de;
-        }
-
-        .success {
-        border-left-color: #2b542c;
-        background-color: rgba(43, 84, 44, 0.1);
-        }
-
-        .success strong {
-        color: #2b542c;
-        }
-
-
-    </style>
-</head>
-<body>
-
-<header class="navbar navbar-default navbar-static-top" role="banner">
-    <div class="container">
-        <div class="navbar-header">
-            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a href="/" class="navbar-brand">Android Application Blackbox Testing Framework</a>
+     <hr>
+      <a href="#"><strong><i class="glyphicon glyphicon-link"></i> Resources</strong></a>  
+      
+      <hr>
+      
+      <ul class="nav nav-pills nav-stacked">
+        <li class="nav-header"></li>
+        <li><a href="#"><i class="glyphicon glyphicon-briefcase"></i> Toolbox</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Reports</a></li>
+        <li><a href="#"><i class="glyphicon glyphicon-book"></i> Pages</a></li>
+      </ul>
+      
+      <hr>
+      
+  	</div><!-- /col-3 -->
+    <div class="col-sm-9">
+      	
+      <a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong></a>  
+      
+      	<hr>
+      	<div class="row">
+          
+	 <div class="col-md-6">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Informations</h4></div>
+                  	<div class="panel-body">
+                	<p><strong>Name :</strong> {{ data["modules"]["info/app"]["run"]["results"]["name"] }} </p>
+			<p><strong>Package :</strong> {{ data["modules"]["info/app"]["run"]["results"]["package_name"] }} </p>
+			<p><strong>Description :</strong> {{ data["modules"]["info/app"]["run"]["results"]["description"].replace("&lt;", "<").replace("&gt;",">") }}
+			<p><strong>Platform: </strong> {{ data["modules"]["info/app"]["run"]["results"]["platform"]["version"] }} - {{ data["modules"]["info/app"]["run"]["results"]["platform"]["name"] }}  </p>
+			<!-- <img src="{{ data["modules"]["info/app"]["run"]["results"]["icon"]}}" alt="app icon" /> -->
+			<p><strong>Debuggable: </strong> {{  "<span class=\"label label-danger\">True</span>" if data["modules"]["info/debuggable"] else "<span class=\"label label-success\">False</span>" }} </p>
         </div>
-    </div>
-</header>
+	</div>
+</div>
+	 <div class="col-md-6">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Hashes</h4></div>
+                  	<div class="panel-body">
+			<table class="table">
+    			<thead>
+			<tr><td>Type</td><td>Value</td></tr>
+			</thead>
+  			<tbody>
+			<tr><td>SHA-256</td><td>{{ data["modules"]["info/app"]["run"]["results"]["hashes"]["sha256"] }}</td></tr>
+			<tr><td>SHA-1</td><td>{{ data["modules"]["info/app"]["run"]["results"]["hashes"]["sha1"] }}</td></tr>
+			<tr><td>MD5</td><td>{{ data["modules"]["info/app"]["run"]["results"]["hashes"]["md5"] }}</td></tr>
+			</tbody>
+			</table>
 
-<!-- Begin Body -->
-<div class="container">
-    <div class="col-md-12" style="margin-top: 20px; margin-bottom: 20px;">
+			</div>
+		</div>
+	</div>
+	
+	 <div class="col-md-6">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Certificate</h4></div>
+                  	<div class="panel-body">      
+			<p><strong>Subject :</strong> {{ data["modules"]["info/certificate"]["run"]["results"]["subject"] }} </p>
+			<p><strong>Serial number :</strong> {{ data["modules"]["info/certificate"]["run"]["results"]["serial_number"] }} </p>
+			<p><strong>Fingerprint :</strong> {{ data["modules"]["info/certificate"]["run"]["results"]["fingerprint"] }} </p>
+			<p><strong>Issuer :</strong> {{ data["modules"]["info/certificate"]["run"]["results"]["issuer"] }} </p>
+			<p><strong>Verified :</strong> {{ "<span class=\"label label-success\">True</span>" if data["modules"]["info/certificate"]["run"]["results"]["verified"] else "<span class=\"label label-danger\">False</span>" }} </p>
+			<p><strong>Version :</strong>  {{ data["modules"]["info/certificate"]["run"]["results"]["version"] }}</p>
+			<!-- <p{{ data["modules"]["info/certificate"]["run"]["results"]["text"].replace("\n", "<br />") }} </p> -->
+			<p><strong>Public key</strong></p>
+			<pre>{{ data["modules"]["info/certificate"]["run"]["results"]["pubkey"] }}</pre>
+			</div>
+		</div>
+	</div>
 
-        <div class="row panel">
-            <img src="https://lh3.ggpht.com/vFpQP39LB60dli3n-rJnVvTM07dsvIzxrCL5xMiy1V4GV4unC1ifXkUExQ4N-DBCKwI=w300"
-                 class="img-thumbnail picture hidden-xs"/>
-            <img src="https://lh3.ggpht.com/vFpQP39LB60dli3n-rJnVvTM07dsvIzxrCL5xMiy1V4GV4unC1ifXkUExQ4N-DBCKwI=w300"
-                 class="img-thumbnail visible-xs picture_mob"/>
+	<div class="col-md-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>Permissions (Status: TODO)</h4></div>
+			<div class="panel-body">
+				<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-default">
+				    <div class="panel-heading" role="tab" id="headingAsked">
+				      <h4 class="panel-title">
+				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapseAsked" aria-expanded="true" aria-controls="collapseAsked">
+				         Asked
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapseAsked" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingAsked">
+				      <div class="panel-body">
+					<table class="table">
+	  				<tbody>
+					{% for permission in data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"] %}
+						<tr><td>{{ permission }}</td></tr>
+					{% endfor %}
+				
+					</tbody>
+					</table>		
+				</div>
+				</div>
+				</div>
 
-            <div class="header" style="margin-left:160px">
-                <h1>Instagram</h1>
-                <h4>com.instagram.android</h4>
-                <span> It&#39;s a simple way to capture and share the world&#39;s moments on your Android. Customize your
-                photos and videos with one of several gorgeous and custom built filter effects. Transform everyday
-                moments into works of art you&#39;ll want to share with friends and family.
-                <br /><br />
-                Share your photos and videos with friends and followers in a photo feed, or send posts directly to your
-                friends.
-                Follow what your friends post with the click of a single button. Every time you open up Instagram, you&#39;ll
-                see new photos and videos from your closest friends, and creative people from around the world.
-                <br /><br />
-                Features
-                <ul>
-                    <li>Linear and Radial Tilt-Shift blur effects for extra depth of field</li>
-                <li>Instant sharing to Facebook, Twitter, Flickr, Tumblr and Foursquare</li>
-                <li>Unlimited uploads</li>
-                <li>Send photos and videos directly to friends</li>
-                <li>Interact with friends through giving &amp; receiving likes and comments</li>
-                <li>And much much more...</li>
+				<div class="panel panel-default">
+				    <div class="panel-heading" role="tab" id="headingUsed">
+				      <h4 class="panel-title">
+				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapseUsed" aria-expanded="true" aria-controls="collapseUsed">
+				         Used
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapseUsed" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingUsed">
+				      <div class="panel-body">
+					<table class="table">
+	  				<tbody>
+					{% for permission in data["modules"]["permissions/granting"]["run"]["results"]["app_permissions"] %}
+						<tr><td>{{ permission }}</td></tr>
+					{% endfor %}
+				
+					</tbody>
+					</table>		
+				</div>
+				</div>
+				</div>	
 
-                </ul>
+				<div class="panel panel-default">
+				    <div class="panel-heading" role="tab" id="headingIntersect">
+				      <h4 class="panel-title">
+				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapseIntersect" aria-expanded="true" aria-controls="collapseIntersect">
+				         Intersect
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapseIntersect" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingIntersect">
+				      <div class="panel-body">
+					<table class="table">
+	  				<tbody>
 
-            </div>
-        </div>
+				
+					</tbody>
+					</table>		
+				</div>
+				</div>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Providers</h4></div>
+                  	<div class="panel-body">      
+		
+			{% if data["modules"]["permissions/providers"]["run"]["results"]|length %}
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			{% else %}
+			<p> No providers found. </p>
+			{% endif %}
 
-    </div>
-    <div class="col-md-12">
-        <h2 id="sec1">Executive Summary</h2>
+			{% for provider in data["modules"]["permissions/providers"]["run"]["results"] %}
 
-        <p>
-            Rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae
-            dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut.
-        </p>
-    </div>
+				<div class="{{ "panel panel-default" if not provider["vulnerable"] else "panel panel-warning" }}">
+				    <div class="panel-heading" role="tab" id="heading{{ provider["name"].replace(".", "") }}">
+				      <h4 class="panel-title">
+				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapse{{ provider["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ provider["name"].replace(".", "") }}">
+				         {{ provider["name"] }}
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapse{{ provider["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ provider["name"].replace(".", "") }}">
+				      <div class="panel-body">
+				<p><strong>Read permission :</strong> {{ provider["read_permission"] }} </p>
+				<p><strong>Permissions :</strong> {{ provider["permission"] }} </p>
+				<p><strong>Process :</strong> {{ provider["process"] }} </p>
+				<p><strong>Exported :</strong> {{ provider["exported"] }} </p>
+				<p><strong>Authorities :</strong> {{ provider["authorities"] }} </p>
+				<p><strong>Label :</strong> {{ provider["label"] }} </p>
+				<p><strong>Grant_uri_permissions :</strong> {{ provider["grant_uri_permissions"] }} </p>
+				<p><strong>Name :</strong> {{ provider["name"] }} </p>
+				<p><strong>Enabled :</strong> {{ provider["enabled"] }} </p>
+				<p><strong>Write permission :</strong> {{ provider["write_permission"] }} </p>			
+	
+			        <table class="table">
+	    			<thead>
+					<tr><td>URI</td></tr>
+				</thead>
+	  			<tbody>
+				{% for uri in provider["uris"] %}
+					<tr><td>{{ uri }}</td></tr>
+				{% endfor %}
+			
+				</tbody>
+				</table>		
+					    </div>
+  			</div>
+			</div>
+			{% endfor %}
+			{% if data["modules"]["permissions/providers"]["run"]["results"]|length %}
+				</div>
+			{% endif %}
+			</div>	
+		</div>
+	</div>
 
-    <div class="col-md-12">
 
-        <h2 id="sec2">Findings & Recommendations</h2>
+	<div class="col-md-6">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Services</h4></div>
+                  	<div class="panel-body">      
+		
+			{% if data["modules"]["permissions/services"]["run"]["results"]|length %}
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			{% else %}
+			<p> No services found. </p>
+			{% endif %}
 
-        <div class="error-notice">
+			{% for service in data["modules"]["permissions/services"]["run"]["results"] %}
 
-            <a data-toggle="collapse" href="#details" aria-expanded="false" aria-controls="collapseExample">
-                <div class="oaerror danger">
-                    <strong>Debuggable bit</strong> - Debuggable bit is set to True.
-                    <p class="collapse" id="details">Rem aperiam, eaque ipsa quae ab illo inventore veritatis et
-                        quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia
-                        voluptas sit aspernatur aut odit aut.</p>
-                </div>
-            </a>
+				<div class="{{  "panel panel-default" if not service["vulnerable"] else "panel panel-warning" }}">
+				    <div class="panel-heading" role="tab" id="heading{{ service["name"].replace(".", "") }}">
+				      <h4 class="panel-title">
+				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapse{{ service["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ service["name"].replace(".", "") }}">
+				         {{ service["name"] }}
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapse{{ service["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ service["name"].replace(".", "") }}">
+				      <div class="panel-body">
+				<p><strong>Process :</strong> {{ service["process"] }} </p>
+				<p><strong>Label :</strong> {{ service["label"] }} </p>
+				<p><strong>Enabled :</strong> {{ service["enabled"] }} </p>
+				<p><strong>Isolated process :</strong> {{ service["isolated_process"] }} </p>
+				<p><strong>Exported :</strong> {{ service["exported"] }} </p>
+					  </div>
+  			</div>
+			</div>
+			{% endfor %}
+			{% if data["modules"]["permissions/services"]["run"]["results"]|length %}
+				</div>
+			{% endif %}
+			</div>	
+		</div>
+	</div>
 
-            <div class="oaerror warning">
-                <strong>Unprotected activities</strong> - Some activities were found to be unprotected
-            </div>
-            <div class="oaerror info">
-                <strong>Application certificate</strong> - Application certificate information
-            </div>
-        </div>
+<div class="col-md-12">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Activities</h4></div>
+                  	<div class="panel-body">
 
-    </div>
-    <div class="col-md-12">
+			{% if data["modules"]["permissions/activities"]["run"]["results"]|length %}
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			{% else %}
+			<p> No activities found. </p>
+			{% endif %}
 
-        <h2 id="about">About</h2>
-        Android Application Blackbox Testing Framework is a framework developed by Quentin Kaiser during his time
-        at Gremwell. The application aims at automating tasks usually performed for an Android application penetration
-        testing engagement.
-        <hr>
-    </div>
+			{% for activity in data["modules"]["permissions/activities"]["run"]["results"] %}
 
+				<div class="{{  "panel panel-default" if not activity["vulnerable"] else "panel panel-warning" }}">
+				    <div class="panel-heading" role="tab" id="heading{{ activity["name"].replace(".", "") }}">
+				      <h4 class="panel-title">
+				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapse{{ activity["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ activity["name"].replace(".", "") }}">
+				         {{ activity["name"] }}
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapse{{ activity["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ activity["name"].replace(".", "") }}">
+				      <div class="panel-body">
+
+                <p><strong>Exported :</strong> {{ activity["exported"] }} </p>
+                <p><strong>Permission:</strong> {{ activity["permission"] }} </p>
+				<p><strong>Intent filters :</strong> {{ activity["intent_filters"]|length }} </p>
+
+
+					  </div>
+  			</div>
+			</div>
+			{% endfor %}
+			{% if data["modules"]["permissions/activities"]["run"]["results"]|length %}
+				</div>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+
+<div class="col-md-12">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Brodcast Receivers</h4></div>
+                  	<div class="panel-body">
+
+			{% if data["modules"]["permissions/broadcast_receivers"]["run"]["results"]|length %}
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			{% else %}
+			<p> No broadcast receivers found. </p>
+			{% endif %}
+
+			{% for broadcast_receiver in data["modules"]["permissions/broadcast_receivers"]["run"]["results"] %}
+
+				<div class="{{  "panel panel-default" if not broadcast_receiver["vulnerable"] else "panel panel-warning" }}">
+				    <div class="panel-heading" role="tab" id="heading{{ broadcast_receiver["name"].replace(".", "") }}">
+				      <h4 class="panel-title">
+				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapse{{ broadcast_receiver["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ broadcast_receiver["name"].replace(".", "") }}">
+				         {{ broadcast_receiver["name"] }}
+				        </a>
+				      </h4>
+				    </div>
+				    <div id="collapse{{ broadcast_receiver["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ broadcast_receiver["name"].replace(".", "") }}">
+				      <div class="panel-body">
+
+                <p><strong>Process :</strong> {{ broadcast_receiver["process"] }} </p>
+				<p><strong>Label :</strong> {{ broadcast_receiver["label"] }} </p>
+				<p><strong>Enabled :</strong> {{ broadcast_receiver["enabled"] }} </p>
+				<p><strong>Exported :</strong> {{ broadcast_receiver["exported"] }} </p>
+                <p><strong>Permission:</strong> {{ broadcast_receiver["permission"] }} </p>
+					  </div>
+  			</div>
+			</div>
+			{% endfor %}
+			{% if data["modules"]["permissions/activities"]["run"]["results"]|length %}
+				</div>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+
+
+     <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                	<div class="panel-heading"><h4>System Services</h4></div>
+                  	<div class="panel-body">
+            <table class="table">
+	    			<thead>
+                    <tr><td>Name</td><td>Calls</td></tr>
+				</thead>
+	  			<tbody>
+                {% for system_service in data["modules"]["info/system_services"]["run"]["results"] %}
+                    <tr><td>{{ system_service }}</td><td>0</td></tr>
+				{% endfor %}
+				</tbody>
+				</table>
+            </div></div></div>
+      </div>
+  	</div><!--/col-span-9-->
+
+
+    <hr>
+
+      <a href="#"><strong><i class="glyphicon glyphicon-warning-sign"></i> Storage</strong></a>
+
+      <hr>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                	<div class="panel-heading"><h4>Logcat</h4><span class="align-right"><a href="/logcat1.txt" alt="Logcat capture">Capture 1</a>
+                    &nbsp;<a href="/logcat1.txt" alt="Logcat capture">Capture 2</a></span></div>
+
+                  	<div class="panel-body">
+
+
+                    <!-- Logs + link to logcat capture -->
+
+                    <pre>
+                        <!-- logcat["main"] -->
+                    </pre>
+
+                    <pre>
+                        <!-- logcat["package"] -->
+                    </pre>
+
+
+
+
+                    </div></div></div>
+      </div>
+
+     <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                	<div class="panel-heading"><h4>SDCard</h4></div>
+
+                  	<div class="panel-body">
+                        List of application owned files written to SDcard along with permission, dates and size.
+
+                        </div></div></div></div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                	<div class="panel-heading"><h4>Shared preferences</h4></div>
+
+                  	<div class="panel-body">
+                        <!--TODO: syntax highlighting -->
+                        <pre>
+&lt;?xml version=“1.0” encoding=“utf-8” standalone=“yes” ?&gt;
+  &lt;map&gt; &lt;string name=&quot;prefrence1&quot;&gt;Hi&lt;/string&gt;
+  &lt;string name=&quot;prefrence2&quot;&gt;Hello&lt;/string&gt;
+  &lt;/map&gt;
+&lt;/xml&gt;
+                        </pre>
+                        </div></div></div></div>
+
+        <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                	<div class="panel-heading"><h4>SQLite</h4></div>
+
+                  	<div class="panel-body">
+                        Links to SQLite files used by the application. Display .schema for each sqlite db ?
+
+                        </div></div></div></div>
+
+
+    <hr>
+
+      <a href="#"><strong><i class="glyphicon glyphicon-warning-sign"></i> Network</strong></a>
+<hr>
+        <p>THE GREAT SCAPY ANALYSIS GOES HERE.</p>
+
+
+
+      <hr>
+      
+      <a href="#"><strong><i class="glyphicon glyphicon-warning-sign"></i> Vulnerabilities</strong></a>  
+      
+      <hr>
+      
+      <div class="row">
+        <div class="col-md-12">
+            <table class="table">
+	    			<thead>
+                    <tr><td>#</td><td>Description</td></tr>
+				</thead>
+	  			<tbody>
+                {% for vulnerability in data["vulnerabilities"] %}
+                    <tr><td><i class="glyphicon glyphicon-info-sign"></i></td>
+                        <td>{{ vulnerability["description"] }}</td></tr>
+				{% endfor %}
+
+				</tbody>
+				</table>
+
+      </div>
+  	</div><!--/col-span-9-->
 </div>
 
-
-<footer>
-    <center><p class="copyright text-muted">Generated on 2014/12/21 at 10:00:01</p></center>
-</footer>
-
-<!-- script references -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="dist/js/bootstrap.min.js"></script>
-<script src="dist/js/scripts.js"></script>
-</body>
+<!-- /Main -->
+  
+	<!-- script references -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+		<script src="templates/dist/js/bootstrap.min.js"></script>
+		<script src="templates/dist/js/scripts.js"></script>
+	</body>
 </html>
