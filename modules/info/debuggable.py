@@ -79,7 +79,7 @@ class Module(framework.module):
             "results": debuggable,
             "logs": logs,
             "vulnerabilities": [framework.Vulnerability(
-                "Debuggable",
+                "The application is debuggable",
                 "The application is set to debuggable. This setting allow anyone to connect a debugger like jdb to the "
                 "running process.",
                 framework.Vulnerability.MEDIUM
