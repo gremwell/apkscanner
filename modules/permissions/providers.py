@@ -55,7 +55,7 @@ class Module(framework.module):
                     and provider["write_permission"] is None:
                 provider["vulnerable"] = True
                 vulnerabilities.append(framework.Vulnerability(
-                    "Exported application provider.",
+                    "Exported content provider.",
                     "The following application provider is exported, which means that any application can access it"
                     " without the need for any custom permission.",
                     framework.Vulnerability.MEDIUM
