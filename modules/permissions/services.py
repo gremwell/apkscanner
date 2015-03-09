@@ -32,6 +32,9 @@ class Module(framework.module):
                     )
                     output = self.avd.shell("am force-stop %s" % (self.apk.get_package()))
                     logs += "adb shell am force-stop %s \n%s" % (self.apk.get_package(), output)
+        if verbose:
+            print logs
+
         return {
             "logs": logs,
             "results": services,
