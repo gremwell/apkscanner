@@ -126,10 +126,15 @@ class APKScanner(framework.module):
                 os.mkdir("analysis/%s/" % self.apk.get_package())
 
             self.output("Setting up logcat logger...")
-            self.subprocesses.append(self.avd.logcat("analysis/%s/logcat_pkg.log" % self.apk.get_package(), tag=self.apk.get_package()))
-            self.subprocesses.append(self.avd.logcat("analysis/%s/logcat_full.log" % self.apk.get_package(), tag=None))
+            if not os.path.exists("analysis/%s/logs" % self.apk.get_package()):
+                os.mkdir("analysis/%s/logs" % self.apk.get_package())
+            self.subprocesses.append(self.avd.logcat("analysis/%s/logs/logcat_pkg.log" % self.apk.get_package(), tag=self.apk.get_package()))
+            self.subprocesses.append(self.avd.logcat("analysis/%s/logs/logcat_full.log" % self.apk.get_package(), tag=None))
+
             self.output("Launching network capture ...")
-            self.avd.start_traffic_capture("analysis/%s/capture_%d.pcap" % (self.apk.get_package(), int(time.time())))
+            if not os.path.exists("analysis/%s/network" % self.apk.get_package()):
+                os.mkdir("analysis/%s/network" % self.apk.get_package())
+            self.avd.start_traffic_capture("analysis/%s/network/capture.pcap" % (self.apk.get_package()))
 
         try:
             modules = self.loaded_modules
@@ -208,16 +213,19 @@ class APKScanner(framework.module):
             env = Environment(loader=FileSystemLoader("reporting/templates"))
             template = env.get_template("index.html")
             html_out = template.render(data=self.analysis)
-            with codecs.open("report.html", "w", "utf-8") as f:
+            with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
                 f.write(html_out)
             return
         elif format == "pdf":
             env = Environment(loader=FileSystemLoader("reporting/templates"))
             template = env.get_template("index.html")
             html_out = template.render(data=self.analysis)
-            with codecs.open("report.html", "w", "utf-8") as f:
+            with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
                 f.write(html_out)
-                HTML(string=html_out).write_pdf("report.pdf", stylesheets=["reporting/templates/dist/css/bootstrap.min.css"])
+                HTML(string=html_out).write_pdf(
+                    "./analysis/%s/report.pdf" % (self.apk.get_package()),
+                    stylesheets=["reporting/templates/dist/css/bootstrap.min.css"]
+                )
             return
         else:
             raise Exception("Unsupported report format.")
@@ -237,18 +245,21 @@ class APKScanner(framework.module):
             if not os.path.exists("./analysis/%s" % self.apk.get_package()):
                 os.mkdir("./analysis/%s" % self.apk.get_package())
 
-            dirs = ["orig", "smali", "jar", "decompiled", "teleported"]
+            if not os.path.exists("./analysis/%s/code" % self.apk.get_package()):
+                os.mkdir("./analysis/%s/code" % self.apk.get_package())
+
+            dirs = ["orig", "smali", "jar", "decompiled", "native"]
             for d in dirs:
-                if not os.path.exists("./analysis/%s/%s" % (self.apk.get_package(), d)):
-                    os.mkdir("./analysis/%s/%s" % (self.apk.get_package(), d))
+                if not os.path.exists("./analysis/%s/code/%s" % (self.apk.get_package(), d)):
+                    os.mkdir("./analysis/%s/code/%s" % (self.apk.get_package(), d))
 
             self.output("Unzipping APK file ...")
             with ZipFile(self.apk.get_filename()) as zipapk:
-                zipapk.extractall("./analysis/%s/orig" % (self.apk.get_package()))
+                zipapk.extractall("./analysis/%s/code/orig" % (self.apk.get_package()))
 
             self.output("Converting DEX to JAR ...")
             p = subprocess.Popen(
-                './libs/dex2jar/dex2jar ./analysis/%s/orig/classes.dex -f -o ./analysis/%s/jar/classes.jar  1>&2' %
+                './libs/dex2jar/dex2jar ./analysis/%s/orig/classes.dex -f -o ./analysis/%s/code/jar/classes.jar  1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -260,7 +271,7 @@ class APKScanner(framework.module):
 
             self.output("Converting DEX to SMALI ...")
             p = subprocess.Popen(
-                './libs/baksmali ./analysis/%s/orig/classes.dex -o ./analysis/%s/smali 1>&2' %
+                './libs/baksmali ./analysis/%s/orig/classes.dex -o ./analysis/%s/code/smali 1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -272,7 +283,7 @@ class APKScanner(framework.module):
 
             self.output("Decompiling JAR file ...")
             p = subprocess.Popen(
-                './libs/jd ./analysis/%s/jar/classes.jar -od ./analysis/%s/decompiled 1>&2' %
+                './libs/jd ./analysis/%s/jar/classes.jar -od ./analysis/%s/code/decompiled 1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -283,7 +294,7 @@ class APKScanner(framework.module):
                 self.error(stderr)
 
             self.output("Converting Application Manifest to human readable format ...")
-            with open("./analysis/%s/orig/AndroidManifest.xml" % self.apk.get_package(), "w") as f:
+            with open("./analysis/%s/code/orig/AndroidManifest.xml" % self.apk.get_package(), "w") as f:
                 f.write(self.apk.get_android_manifest_xml().toprettyxml().decode('utf-8'))
 
         except Exception as e:
@@ -295,21 +306,21 @@ class APKScanner(framework.module):
 
         if not os.path.exists("./analysis/%s" % (self.apk.get_package())):
             os.mkdir("./analysis/%s" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/device" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/device/" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/device/sdcard" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/device/sdcard" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/device/data" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/device/data" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/device/data/data" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/device/data/data" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/device/data/data/%s" % (self.apk.get_package(), self.apk.get_package())):
-            os.mkdir("./analysis/%s/device/data/data/%s" % (self.apk.get_package(), self.apk.get_package()))
-        if not os.path.exists("./analysis/%s/device/data/system" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/device/data/system" % (self.apk.get_package()))
+        if not os.path.exists("./analysis/%s/storage" % (self.apk.get_package())):
+            os.mkdir("./analysis/%s/storage/" % self.apk.get_package())
+        if not os.path.exists("./analysis/%s/storage/sdcard" % (self.apk.get_package())):
+            os.mkdir("./analysis/%s/storage/sdcard" % self.apk.get_package())
+        if not os.path.exists("./analysis/%s/storage/data" % (self.apk.get_package())):
+            os.mkdir("./analysis/%s/storage/data" % self.apk.get_package())
+        if not os.path.exists("./analysis/%s/storage/data/data" % (self.apk.get_package())):
+            os.mkdir("./analysis/%s/storage/data/data" % self.apk.get_package())
+        if not os.path.exists("./analysis/%s/storage/data/data/%s" % (self.apk.get_package(), self.apk.get_package())):
+            os.mkdir("./analysis/%s/storage/data/data/%s" % (self.apk.get_package(), self.apk.get_package()))
+        if not os.path.exists("./analysis/%s/storage/data/system" % (self.apk.get_package())):
+            os.mkdir("./analysis/%s/storage/data/system" % (self.apk.get_package()))
 
         source = "/data/data/%s" % self.apk.get_package()
-        dest = "./analysis/%s/device/data/data" % self.apk.get_package()
+        dest = "./analysis/%s/storage/data/data" % self.apk.get_package()
         avd.pull(source, dest)
 
         self.output("Teleporting data ...")
@@ -317,8 +328,8 @@ class APKScanner(framework.module):
         #search files owned by the application's user (u0_a46) in the sdcard mount point.
         #1. get application UID
         uid = None
-        avd.pull("/data/system/packages.list", "./analysis/%s/device/data/system/" % self.apk.get_package())
-        with open("./analysis/%s/device/data/system/packages.list" % self.apk.get_package(), "rb") as f:
+        avd.pull("/data/system/packages.list", "./analysis/%s/storage/data/system/" % self.apk.get_package())
+        with open("./analysis/%s/storage/data/system/packages.list" % self.apk.get_package(), "rb") as f:
             for line in f.readlines():
                 if line.startswith(self.apk.get_package()):
                     uid = int(line.split(" ")[1])
@@ -328,7 +339,7 @@ class APKScanner(framework.module):
             self.output("Searching for files owned by user %d" % uid)
             files = avd.shell("find /sdcard -type f -user %d" % uid)
             for f in [x for x in files.split("\n") if len(x)]:
-                print avd.pull(f, "./analysis/%s/device/sdcard" % self.apk.get_package())
+                print avd.pull(f, "./analysis/%s/storage/sdcard" % self.apk.get_package())
         return
 
     def find_avd(self):

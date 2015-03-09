@@ -26,9 +26,6 @@ class Module(framework.module):
         logs = ""
         vulnerabilities = []
         libs = []
-
-        if not os.path.exists("./analysis/%s/native" % self.apk.get_package()):
-                os.mkdir("./analysis/%s/native" % self.apk.get_package())
             
         d = dvm.DalvikVMFormat(self.apk.get_dex())
         dx = VMAnalysis(d)
@@ -49,10 +46,10 @@ class Module(framework.module):
             if len(matches):
                 for m in matches:
                     for arch in ["armeabi", "armeabiv7", "x86", "mipsel"]:
-                        path = "./analysis/%s/orig/lib/%s/lib%s.so" % (self.apk.get_package(), arch, m)
+                        path = "./analysis/%s/code/orig/lib/%s/lib%s.so" % (self.apk.get_package(), arch, m)
                         if path not in [x["path"] for x in libs]:
                             if os.path.exists(path):
-                                copy(path, "./analysis/%s/native" % self.apk.get_package())
+                                copy(path, "./analysis/%s/code/native" % self.apk.get_package())
 
                                 ndk_path = None
                                 for p in os.environ["PATH"].split(":"):
@@ -72,7 +69,7 @@ class Module(framework.module):
                                                     break
 
                                 if objdump_bin is not None:
-                                    objdump_outfile = "./analysis/%s/native/lib%s.objdump" % (self.apk.get_package(), m)
+                                    objdump_outfile = "./analysis/%s/code/native/lib%s.objdump" % (self.apk.get_package(), m)
                                     with open(objdump_outfile, "wb") as f:
                                         exitcode = subprocess.call("%s -D %s" % (objdump_bin, os.path.abspath(path)),
                                                                shell=True,
