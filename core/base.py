@@ -20,6 +20,9 @@ from androguard.core import androconf
 from androguard.core.bytecodes import apk
 from android import *
 from scapy import *
+from jinja2 import Environment, FileSystemLoader
+from weasyprint import HTML
+import codecs
 
 
 # define colors for output
@@ -88,6 +91,7 @@ class APKScanner(framework.module):
         self.avd.push("./libs/busybox-android/android-remote-install.sh", "/system/bin/android-remote-install.sh")
         self.avd.shell("chmod 777 /system/bin/android-remote-install.sh")
         self.avd.shell("/system/bin/android-remote-install.sh")
+        self.avd.unlock()
 
         self.output("Launching application ...")
         for a in self.get_activities():
@@ -111,12 +115,15 @@ class APKScanner(framework.module):
         if not self.static_only:
             self.output("Searching AVD ...")
             self.avd = self.find_avd()
-            self.output("AVD found")
+            self.output("AVD found [emulator-%d running %s]" % (self.avd._id, self.avd.name))
             if not self.avd.isrunning:
                 self.output("Launching AVD")
                 self.avd.launch(self.on_boot, headless=True)
             else:
                 self.deploy()
+
+            if not os.path.exists("analysis/%s/" % self.apk.get_package()):
+                os.mkdir("analysis/%s/" % self.apk.get_package())
 
             self.output("Setting up logcat logger...")
             self.subprocesses.append(self.avd.logcat("analysis/%s/logcat_pkg.log" % self.apk.get_package(), tag=self.apk.get_package()))
@@ -196,12 +203,23 @@ class APKScanner(framework.module):
         if format == "json":
             with open("./analysis/%s.json" % self.apk.get_package(), "wb") as f:
                 f.write(json.dumps(self.analysis))
-        elif format == "xml":
-            return
         elif format == "html":
+            env = Environment(loader=FileSystemLoader("reporting/templates"))
+            template = env.get_template("index.html")
+            html_out = template.render(data=self.analysis)
+            with codecs.open("report.html", "w", "utf-8") as f:
+                f.write(html_out)
+            return
+        elif format == "pdf":
+            env = Environment(loader=FileSystemLoader("reporting/templates"))
+            template = env.get_template("index.html")
+            html_out = template.render(data=self.analysis)
+            with codecs.open("report.html", "w", "utf-8") as f:
+                f.write(html_out)
+                HTML(string=html_out).write_pdf("report.pdf", stylesheets=["templates/dist/css/bootstrap.min.css"])
             return
         else:
-            return
+            raise Exception("Unsupported report format.")
 
     def fry(self):
         """Unzip apk file, convert dex to jar with dex2jar, convert dex to smali files with baksmali, convert manifest
