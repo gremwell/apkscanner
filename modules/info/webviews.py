@@ -101,8 +101,6 @@ class Module(framework.module):
                 framework.Vulnerability.LOW
             ).__dict__)
 
-        import json
-        print json.dumps(webviews)
         return {
             "results": webviews,
             "logs": "",
