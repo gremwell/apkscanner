@@ -6,11 +6,11 @@
 		<title>Bootstrap 3 Admin</title>
 		<meta name="generator" content="Bootply" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<link href="templates/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link href="reporting/templates/dist/css/bootstrap.min.css" rel="stylesheet">
 		<!--[if lt IE 9]>
 			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
-		<link href="templates/dist/css/styles.css" rel="stylesheet">
+		<link href="reporting/templates/dist/css/styles.css" rel="stylesheet">
 	</head>
 	<body>
 <!-- Header -->
@@ -22,19 +22,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">Dashboard</a>
-    </div>
-    <div class="navbar-collapse collapse">
-      <ul class="nav navbar-nav navbar-right">
-        
-        <li class="dropdown">
-          <a class="dropdown-toggle" role="button" data["modules"]-toggle="dropdown" href="#"><i class="glyphicon glyphicon-user"></i> Admin <span class="caret"></span></a>
-          <ul id="g-account-menu" class="dropdown-menu" role="menu">
-            <li><a href="#">My Profile</a></li>
-          </ul>
-        </li>
-        <li><a href="#"><i class="glyphicon glyphicon-lock"></i> Logout</a></li>
-      </ul>
+      <a class="navbar-brand" href="#">APKScanner Report ({{ data["modules"]["info/app"]["run"]["results"]["package_name"] }})</a>
     </div>
   </div><!-- /container -->
 </div>
@@ -43,63 +31,11 @@
 <!-- Main -->
 <div class="container-fluid">
 <div class="row">
-	<div class="col-sm-3">
-      <!-- Left column -->
-      <a href="#"><strong><i class="glyphicon glyphicon-wrench"></i>Static Analysis</strong></a>  
-       <ul class="nav nav-pills nav-stacked">
-        <li class="nav-header"></li>   
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Informations</a></li> 
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Intents</a></li> 
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Logs</a></li> 
-	 <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Permissions</a></li> 
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Providers</a></li>
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Receivers</a></li>
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Services</a></li> 
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Search</a></li>
-	</ul>
-	 
-     <hr>
-      <a href="#"><strong><i class="glyphicon glyphicon-wrench"></i></strong></a>
-       <ul class="nav nav-pills nav-stacked">
-        <li class="nav-header"></li>   
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> All files</a></li>
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Manifest</a></li>
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Resources</a></li>
-	</ul>
+    <div class="col-md-10">
 
-    <hr>
-      <a href="#"><strong><i class="glyphicon glyphicon-wrench"></i>Dynamic Analysis</strong></a>
-       <ul class="nav nav-pills nav-stacked">
-        <li class="nav-header"></li>
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Traffic</a></li>
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Files</a></li>
-	<li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Database</a></li>
-	 <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Crypto</a></li>
-	</ul>
-
-     <hr>
-      <a href="#"><strong><i class="glyphicon glyphicon-link"></i> Resources</strong></a>  
-      
-      <hr>
-      
-      <ul class="nav nav-pills nav-stacked">
-        <li class="nav-header"></li>
-        <li><a href="#"><i class="glyphicon glyphicon-briefcase"></i> Toolbox</a></li>
-        <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Reports</a></li>
-        <li><a href="#"><i class="glyphicon glyphicon-book"></i> Pages</a></li>
-      </ul>
-      
-      <hr>
-      
-  	</div><!-- /col-3 -->
-    <div class="col-sm-9">
-      	
-      <a href="#"><strong><i class="glyphicon glyphicon-dashboard"></i> My Dashboard</strong></a>  
-      
-      	<hr>
       	<div class="row">
           
-	 <div class="col-md-6">
+	 <div class="col-md-5 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Informations</h4></div>
                   	<div class="panel-body">
@@ -112,7 +48,7 @@
         </div>
 	</div>
 </div>
-	 <div class="col-md-6">
+	 <div class="col-md-5">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Hashes</h4></div>
                   	<div class="panel-body">
@@ -131,7 +67,7 @@
 		</div>
 	</div>
 	
-	 <div class="col-md-6">
+	 <div class="col-md-5 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Certificate</h4></div>
                   	<div class="panel-body">      
@@ -148,9 +84,9 @@
 		</div>
 	</div>
 
-	<div class="col-md-6">
+	<div class="col-md-5">
 		<div class="panel panel-default">
-			<div class="panel-heading"><h4>Permissions (Status: TODO)</h4></div>
+			<div class="panel-heading"><h4>Permissions</h4></div>
 			<div class="panel-body">
 				<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 				<div class="panel panel-default">
@@ -195,32 +131,12 @@
 					</table>		
 				</div>
 				</div>
-				</div>	
-
-				<div class="panel panel-default">
-				    <div class="panel-heading" role="tab" id="headingIntersect">
-				      <h4 class="panel-title">
-				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapseIntersect" aria-expanded="true" aria-controls="collapseIntersect">
-				         Intersect
-				        </a>
-				      </h4>
-				    </div>
-				    <div id="collapseIntersect" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingIntersect">
-				      <div class="panel-body">
-					<table class="table">
-	  				<tbody>
-
-				
-					</tbody>
-					</table>		
-				</div>
-				</div>
 				</div>
 			</div>
 			</div>
 		</div>
 	</div>
-	<div class="col-md-6">
+	<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Providers</h4></div>
                   	<div class="panel-body">      
@@ -277,7 +193,7 @@
 	</div>
 
 
-	<div class="col-md-6">
+	<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Services</h4></div>
                   	<div class="panel-body">      
@@ -316,7 +232,7 @@
 		</div>
 	</div>
 
-<div class="col-md-12">
+<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Activities</h4></div>
                   	<div class="panel-body">
@@ -356,7 +272,7 @@
 		</div>
 	</div>
 
-<div class="col-md-12">
+<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Brodcast Receivers</h4></div>
                   	<div class="panel-body">
@@ -398,7 +314,7 @@
 
 
      <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-10 col-md-offset-2">
             <div class="panel panel-default">
                 	<div class="panel-heading"><h4>System Services</h4></div>
                   	<div class="panel-body">
@@ -417,112 +333,11 @@
   	</div><!--/col-span-9-->
 
 
-    <hr>
-
-      <a href="#"><strong><i class="glyphicon glyphicon-warning-sign"></i> Storage</strong></a>
-
-      <hr>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                	<div class="panel-heading"><h4>Logcat</h4><span class="align-right"><a href="/logcat1.txt" alt="Logcat capture">Capture 1</a>
-                    &nbsp;<a href="/logcat1.txt" alt="Logcat capture">Capture 2</a></span></div>
-
-                  	<div class="panel-body">
-
-
-                    <!-- Logs + link to logcat capture -->
-
-                    <pre>
-                        <!-- logcat["main"] -->
-                    </pre>
-
-                    <pre>
-                        <!-- logcat["package"] -->
-                    </pre>
-
-
-
-
-                    </div></div></div>
-      </div>
-
-     <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                	<div class="panel-heading"><h4>SDCard</h4></div>
-
-                  	<div class="panel-body">
-                        List of application owned files written to SDcard along with permission, dates and size.
-
-                        </div></div></div></div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                	<div class="panel-heading"><h4>Shared preferences</h4></div>
-
-                  	<div class="panel-body">
-                        <!--TODO: syntax highlighting -->
-                        <pre>
-&lt;?xml version=“1.0” encoding=“utf-8” standalone=“yes” ?&gt;
-  &lt;map&gt; &lt;string name=&quot;prefrence1&quot;&gt;Hi&lt;/string&gt;
-  &lt;string name=&quot;prefrence2&quot;&gt;Hello&lt;/string&gt;
-  &lt;/map&gt;
-&lt;/xml&gt;
-                        </pre>
-                        </div></div></div></div>
-
-        <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                	<div class="panel-heading"><h4>SQLite</h4></div>
-
-                  	<div class="panel-body">
-                        Links to SQLite files used by the application. Display .schema for each sqlite db ?
-
-                        </div></div></div></div>
-
-
-    <hr>
-
-      <a href="#"><strong><i class="glyphicon glyphicon-warning-sign"></i> Network</strong></a>
-<hr>
-        <p>THE GREAT SCAPY ANALYSIS GOES HERE.</p>
-
-
-
-      <hr>
-      
-      <a href="#"><strong><i class="glyphicon glyphicon-warning-sign"></i> Vulnerabilities</strong></a>  
-      
-      <hr>
-      
-      <div class="row">
-        <div class="col-md-12">
-            <table class="table">
-	    			<thead>
-                    <tr><td>#</td><td>Description</td></tr>
-				</thead>
-	  			<tbody>
-                {% for vulnerability in data["vulnerabilities"] %}
-                    <tr><td><i class="glyphicon glyphicon-info-sign"></i></td>
-                        <td>{{ vulnerability["description"] }}</td></tr>
-				{% endfor %}
-
-				</tbody>
-				</table>
-
-      </div>
-  	</div><!--/col-span-9-->
-</div>
-
 <!-- /Main -->
   
 	<!-- script references -->
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-		<script src="templates/dist/js/bootstrap.min.js"></script>
-		<script src="templates/dist/js/scripts.js"></script>
+		<script src="reporting/templates/dist/js/bootstrap.min.js"></script>
+		<script src="reporting/templates/dist/js/scripts.js"></script>
 	</body>
 </html>
