@@ -279,7 +279,7 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         framework.module.__init__(self, apk, avd)
         self.info = {
-            "Name": "Permissions granting analyzer",
+            "Name": "Permissions analyzer",
             "Author": "Quentin Kaiser (@QKaiser)",
             "Description": "This module compares the permissions asked by the application in the application manifest "
                            "and the permissions actually used by the application to detect undergranting or overgranting"
@@ -292,6 +292,7 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
+        #TODO: the real issue is that "is the code linked to a permission really reached during runtime ?"
         logs = ""
         vulnerabilities = []
 
@@ -300,21 +301,42 @@ class Module(framework.module):
         d.set_vmanalysis(dx)
 
         results = {
-            "manifest_permissions": self.apk.get_permissions(),
+            "manifest_permissions": self.get_permissions(),
             "app_permissions": ["android.permission.%s" % (str(p)) for p in dx.get_permissions([])]
         }
+        perms = dx.get_permissions([])
+        for perm in perms:
+            t=False
+            for path in perms[perm]:
+                if isinstance(path, PathP):
+                    method = d.get_method_by_idx(path.get_src_idx())
+                    if self.apk.get_package() in method.get_class_name().replace("/", "."):
+                        if method.get_code() is None:
+                            continue
+                        print method.get_class_name()
+                        t=True
+            if not t:
+                perms[perm] = None
+
+        if verbose:
+            print "Manifest permissions:"
+            for permission in results["manifest_permissions"]:
+                print "\t%s" % permission
+            print "App permissions:"
+            for permission in results["app_permissions"]:
+                print "\t%s" % permission
+
         undergranting = [x for x in results["app_permissions"]
-                         if x in permissions and permissions[x]["protection_level"] is not "normal" and
-                         x not in results["manifest_permissions"] and x[0:7] == "android"]
+                         if x in permissions and permissions[x]["protection_level"] != "normal" and x not in results["manifest_permissions"]]
         overgranting = [x for x in results["manifest_permissions"]
-                        if x in permissions and permissions[x]["protection_level"] is not "normal" and
-                        x not in results["app_permissions"] and x[0:7] == "android"]
+                        if x in permissions and permissions[x]["protection_level"] != "normal" and x not in results["app_permissions"]]
 
         if len(undergranting):
             vulnerabilities.append(framework.Vulnerability(
                 "Application permissions undergranting.",
                 "The application is using permissions that have not been requested in the application manifest. "
-                "This could lead to application error and security hazard.",
+                "This could lead to application error and security hazard."
+                "The following permissions are undergranted:\n%s" % ("\n".join(undergranting)),
                 framework.Vulnerability.LOW
             ).__dict__)
 
@@ -322,7 +344,8 @@ class Module(framework.module):
             vulnerabilities.append(framework.Vulnerability(
                 "Application permissions overgranting.",
                 "The application is requesting more permissions than needed in the manifest. While it is not really a"
-                "vulnerability, this behaviour is not good.",
+                "vulnerability, this behaviour is not good."
+                "The following permissions are overgranted:\n%s" % ("\n".join(overgranting)),
                 framework.Vulnerability.LOW
             ).__dict__)
 
