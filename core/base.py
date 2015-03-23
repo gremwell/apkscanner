@@ -366,7 +366,7 @@ class APKScanner(framework.module):
                     t = target
                     break
             if t is None:
-                self.alert("Can't find a target, installing necessary target...")
+                self.alert("Can't find a target, installing necessary target (it can take time) ...")
                 p = subprocess.Popen(
                     "android update sdk -u -t %s" %
                     ",".join([str(x) for x in xrange(int(self.apk.get_min_sdk_version()),
@@ -385,6 +385,8 @@ class APKScanner(framework.module):
                         self.error("Missing internet connectivity. Aborting...")
                     else:
                         self.alert("Necessary target installed.")
+                        targets = Android.get_targets()
+                        targets.reverse()
                         for target in targets:
                             if int(self.apk.get_min_sdk_version()) <= target.api_level <= \
                                     int(self.apk.get_target_sdk_version()):
