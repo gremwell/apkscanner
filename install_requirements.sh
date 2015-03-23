@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo apt-get install default-jdk default-jre swig python-virtualenv python-dev libffi-dev libxslt-dev libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 -y
+
 ANDROID_SDK="http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz"
 MACHINE_TYPE=`uname -m`
 if [ ${MACHINE_TYPE} == 'x86_64' ]; then
@@ -22,3 +24,5 @@ if [ -z `which ndk-build` ]; then
 	mv android-ndk-r10d ~
 fi
 echo 'export PATH=$PATH:~/android-sdk-linux/tools:~/android-sdk-linux/platform-tools:~/android-ndk-r10d'  >> ~/.profile
+source ~/.profile
+sleep 3 && while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t system-image,platform-tools
