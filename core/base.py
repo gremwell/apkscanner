@@ -242,6 +242,8 @@ class APKScanner(framework.module):
         """
         try:
             self.output("Building analysis directory ...")
+            if not os.path.exists("./analysis"):
+                os.mkdir("./analysis")
             if not os.path.exists("./analysis/%s" % self.apk.get_package()):
                 os.mkdir("./analysis/%s" % self.apk.get_package())
 
