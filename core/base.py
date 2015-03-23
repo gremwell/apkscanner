@@ -398,7 +398,7 @@ class APKScanner(framework.module):
             name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
             while name in [avd.name for avd in Android.get_avds()]:
                 name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
-            if t.tag_abis[0] is not None:
+            if t.tag_abis is not None:
                 return AVD.create(name, t.id, Android.get_devices()[0].id, tag_abi=t.tag_abis[0], sdcard="512M")
             else:
                 return AVD.create(name, t.id, Android.get_devices()[0].id, sdcard="512M")
