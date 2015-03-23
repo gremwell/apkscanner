@@ -25,4 +25,6 @@ if [ -z `which ndk-build` ]; then
 fi
 echo 'export PATH=$PATH:~/android-sdk-linux/tools:~/android-sdk-linux/platform-tools:~/android-ndk-r10d'  >> ~/.profile
 source ~/.profile
-sleep 3 && while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t system-image,platform-tools
+while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t platform-tools
+while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t system-image
+while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t tools
