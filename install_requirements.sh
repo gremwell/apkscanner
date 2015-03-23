@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ANDROID_SDK="http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz"
 MACHINE_TYPE=`uname -m`
