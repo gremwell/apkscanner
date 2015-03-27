@@ -53,6 +53,10 @@ class Module(framework.module):
 
             if provider["exported"] and provider["permission"] is None and provider["read_permission"] is None\
                     and provider["write_permission"] is None:
+                if self.avd is not None:
+                    for uri in provider["uris"]:
+                        logs += "$ adb shell content query --uri %s\n" % uri
+                        logs += self.avd.shell("content query --uri %s" % uri)
                 provider["vulnerable"] = True
                 vulnerabilities.append(framework.Vulnerability(
                     "Exported content provider.",
@@ -63,6 +67,8 @@ class Module(framework.module):
             else:
                 provider["vulnerable"] = False
 
+        if verbose:
+            print logs
         return {
             "results": providers,
             "logs": logs,
