@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sudo apt-get update
 sudo apt-get install default-jdk default-jre swig python-virtualenv python-dev libffi-dev libxslt-dev libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 -y
 
 ANDROID_SDK="http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz"
