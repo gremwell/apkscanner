@@ -322,7 +322,7 @@ class APKScanner(framework.module):
             os.mkdir("./analysis/%s/storage/data/system" % (self.apk.get_package()))
 
         source = "/data/data/%s" % self.apk.get_package()
-        dest = "./analysis/%s/storage/data/data" % self.apk.get_package()
+        dest = "./analysis/%s/storage/data/data/%s/" % (self.apk.get_package(), self.apk.get_package())
         avd.pull(source, dest)
 
         self.output("Teleporting data ...")
