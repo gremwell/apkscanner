@@ -21,7 +21,7 @@ class Module(framework.module):
             if service["exported"] and service["permission"] is None and not len(service['intent_filters']):
                 if self.avd is not None:
                     output = self.avd.shell("am startservice -n %s/%s" % (self.apk.get_package(), service["name"]))
-                    logs += "adb shell am startservice -n %s/%s\n%s\n" % (self.apk.get_package(), service["name"], output)
+                    logs += "$ adb shell am startservice -n %s/%s\n%s\n" % (self.apk.get_package(), service["name"], output)
                     if "Error: Not found; no service started." not in output:
                         service["vulnerable"] = True
                         vulnerabilities.append(
@@ -32,7 +32,7 @@ class Module(framework.module):
                             ).__dict__
                         )
                     output = self.avd.shell("am force-stop %s" % (self.apk.get_package()))
-                    logs += "adb shell am force-stop %s \n%s" % (self.apk.get_package(), output)
+                    logs += "$ adb shell am force-stop %s \n%s" % (self.apk.get_package(), output)
         if verbose:
             print logs
 
