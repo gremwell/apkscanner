@@ -45,6 +45,7 @@
 			<p><strong>Platform: </strong> {{ data["modules"]["info/app"]["run"]["results"]["platform"]["version"] }} - {{ data["modules"]["info/app"]["run"]["results"]["platform"]["name"] }}  </p>
 			<!-- <img src="{{ data["modules"]["info/app"]["run"]["results"]["icon"]}}" alt="app icon" /> -->
 			<p><strong>Debuggable: </strong> {{  "<span class=\"label label-danger\">True</span>" if data["modules"]["info/debuggable"] else "<span class=\"label label-success\">False</span>" }} </p>
+			<p><strong>Obfuscation: </strong> {{ data["modules"]["info/obfuscation"]["run"]["results"] }} </p>
         </div>
 	</div>
 </div>
@@ -66,7 +67,7 @@
 			</div>
 		</div>
 	</div>
-	
+		
 	 <div class="col-md-5 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Certificate</h4></div>
@@ -87,55 +88,62 @@
 	<div class="col-md-5">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>Permissions</h4></div>
-			<div class="panel-body">
-				<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-				<div class="panel panel-default">
-				    <div class="panel-heading" role="tab" id="headingAsked">
-				      <h4 class="panel-title">
-				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapseAsked" aria-expanded="true" aria-controls="collapseAsked">
-				         Asked
-				        </a>
-				      </h4>
-				    </div>
-				    <div id="collapseAsked" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingAsked">
-				      <div class="panel-body">
-					<table class="table">
-	  				<tbody>
-					{% for permission in data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"] %}
-						<tr><td>{{ permission }}</td></tr>
-					{% endfor %}
-				
-					</tbody>
-					</table>		
-				</div>
-				</div>
-				</div>
-
-				<div class="panel panel-default">
-				    <div class="panel-heading" role="tab" id="headingUsed">
-				      <h4 class="panel-title">
-				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapseUsed" aria-expanded="true" aria-controls="collapseUsed">
-				         Used
-				        </a>
-				      </h4>
-				    </div>
-				    <div id="collapseUsed" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingUsed">
-				      <div class="panel-body">
-					<table class="table">
-	  				<tbody>
-					{% for permission in data["modules"]["permissions/granting"]["run"]["results"]["app_permissions"] %}
-						<tr><td>{{ permission }}</td></tr>
-					{% endfor %}
-				
-					</tbody>
-					</table>		
-				</div>
-				</div>
-				</div>
-			</div>
+				<table class="table">
+	  			<tbody>
+				{% for permission in data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"] %}
+					<tr><td>{{ permission }}</td></tr>
+				{% endfor %}
+				</tbody>
+				</table>		
 			</div>
 		</div>
 	</div>
+	
+	<div class="col-md-10 col-md-offset-2">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>Native Code</h4></div>
+
+            {% if data["modules"]["info/native"]["run"]["results"]|length %}
+                <table class="table">
+                <thead><td>Name</td><td>Path</td><td>Arch</td><td>Info</td></thead>
+                <tbody>
+                {% for lib in data["modules"]["info/native"]["run"]["results"] %}
+                    <tr><td>{{ lib["name"] }}</td><td>{{ lib["path"] }}</td><td>{{ lib["arch"] }}</td><td>{{ lib["info"] }}</td></tr>
+                {% endfor %}
+                </tbody>
+                </table>
+			{% else %}
+			<p> No native code found. </p>
+			{% endif %}
+
+			
+		</div>
+	</div>
+
+        <div class="col-md-10 col-md-offset-2">
+            <div class="panel panel-default">
+                	<div class="panel-heading"><h4>System Services</h4></div>
+                  	<div class="panel-body">
+                        {% if data["modules"]["info/system_services"]["run"]["results"]|length %}
+                 <table class="table">
+	    			<thead>
+                    <tr><td>Name</td><td>Calls</td></tr>
+				</thead>
+	  			<tbody>
+                {% for system_service in data["modules"]["info/system_services"]["run"]["results"] %}
+                    <tr><td>{{ system_service }}</td><td>0</td></tr>
+				{% endfor %}
+				</tbody>
+				</table>
+			{% else %}
+			<p> No service call found. </p>
+			{% endif %}
+
+
+            </div></div></div>
+
+
+
 	<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Providers</h4></div>
@@ -313,24 +321,7 @@
 	</div>
 
 
-     <div class="row">
-        <div class="col-md-10 col-md-offset-2">
-            <div class="panel panel-default">
-                	<div class="panel-heading"><h4>System Services</h4></div>
-                  	<div class="panel-body">
-            <table class="table">
-	    			<thead>
-                    <tr><td>Name</td><td>Calls</td></tr>
-				</thead>
-	  			<tbody>
-                {% for system_service in data["modules"]["info/system_services"]["run"]["results"] %}
-                    <tr><td>{{ system_service }}</td><td>0</td></tr>
-				{% endfor %}
-				</tbody>
-				</table>
-            </div></div></div>
-      </div>
-  	</div><!--/col-span-9-->
+
 
 
 <!-- /Main -->
