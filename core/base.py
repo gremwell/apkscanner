@@ -261,7 +261,7 @@ class APKScanner(framework.module):
 
             self.output("Converting DEX to JAR ...")
             p = subprocess.Popen(
-                './libs/dex2jar/dex2jar ./analysis/%s/orig/classes.dex -f -o ./analysis/%s/code/jar/classes.jar  1>&2' %
+                './libs/dex2jar/dex2jar ./analysis/%s/code/orig/classes.dex -f -o ./analysis/%s/code/jar/classes.jar  1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -273,7 +273,7 @@ class APKScanner(framework.module):
 
             self.output("Converting DEX to SMALI ...")
             p = subprocess.Popen(
-                './libs/baksmali ./analysis/%s/orig/classes.dex -o ./analysis/%s/code/smali 1>&2' %
+                './libs/baksmali ./analysis/%s/code/orig/classes.dex -o ./analysis/%s/code/smali 1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -285,7 +285,7 @@ class APKScanner(framework.module):
 
             self.output("Decompiling JAR file ...")
             p = subprocess.Popen(
-                './libs/jd ./analysis/%s/jar/classes.jar -od ./analysis/%s/code/decompiled 1>&2' %
+                './libs/jd ./analysis/%s/code/jar/classes.jar -od ./analysis/%s/code/decompiled 1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
