@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 		<meta charset="utf-8">
-		<title>Bootstrap 3 Admin</title>
+		<title>APKScanner Report</title>
 		<meta name="generator" content="Bootply" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<link href="reporting/templates/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -193,6 +193,9 @@
   			</div>
 			</div>
 			{% endfor %}
+            <br />
+            <br />
+            <pre>{{ data["modules"]["permissions/providers"]["run"]["logs"] }}</pre>
 			{% if data["modules"]["permissions/providers"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
@@ -233,6 +236,9 @@
   			</div>
 			</div>
 			{% endfor %}
+            <br />
+            <br />
+            <pre>{{ data["modules"]["permissions/services"]["run"]["logs"] }}</pre>
 			{% if data["modules"]["permissions/services"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
@@ -271,8 +277,12 @@
 
 					  </div>
   			</div>
+
 			</div>
 			{% endfor %}
+            <br />
+            <br />
+            <pre>{{ data["modules"]["permissions/activities"]["run"]["logs"] }}</pre>
 			{% if data["modules"]["permissions/activities"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
