@@ -20,9 +20,11 @@ from androguard.core import androconf
 from androguard.core.bytecodes import apk
 from android import *
 from scapy import *
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Markup
 from weasyprint import HTML
 import codecs
+
+
 
 
 # define colors for output
@@ -206,20 +208,44 @@ class APKScanner(framework.module):
         Returns:
         Throws:
         """
+        loader = FileSystemLoader("reporting/templates")
+        env = Environment(loader=loader)
         if format == "json":
             with open("./analysis/%s.json" % self.apk.get_package(), "wb") as f:
                 f.write(json.dumps(self.analysis))
         elif format == "html":
-            env = Environment(loader=FileSystemLoader("reporting/templates"))
+            logcat = ""
+            with open("./analysis/%s/logs/logcat_full.log" % (self.apk.get_package())) as f:
+                logcat = f.read()
+
+            def list_files(startpath):
+                s = ""
+                for root, dirs, files in os.walk(startpath):
+                    level = root.replace(startpath, '').count(os.sep)
+                    indent = '\t' * (level)
+                    s += "\n%s<a href='file://%s/%s'>%s</a>/" % (indent, os.path.dirname(os.path.realpath(__file__)), root, os.path.basename(root))
+                    subindent = '\t' * (level + 1)
+                    for l in files:
+                        s += "\n%s<a href='file://%s/%s/%s' >%s</a>" % (subindent, os.path.dirname(os.path.realpath(__file__)), root, l, l)
+                return s
+
+            #internal_storage = list_files("./analysis/%s/storage/data/data" % self.apk.get_package())
+            internal_storage = ""
+            external_storage = list_files("./analysis/%s/storage/sdcard" % self.apk.get_package())
             template = env.get_template("index.html")
-            html_out = template.render(data=self.analysis)
+            html_out = template.render(data=self.analysis, logcat=logcat,
+                                       internal_storage=internal_storage,
+                                       external_storage=external_storage)
             with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
                 f.write(html_out)
             return
         elif format == "pdf":
             env = Environment(loader=FileSystemLoader("reporting/templates"))
+            logcat = ""
+            with open("./analysis/%s/logs/logcat_full.log" % (self.apk.get_package())) as f:
+                logcat = f.read()
             template = env.get_template("index.html")
-            html_out = template.render(data=self.analysis)
+            html_out = template.render(data=self.analysis, logcat=logcat)
             with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
                 f.write(html_out)
                 HTML(string=html_out).write_pdf(
@@ -358,7 +384,6 @@ class APKScanner(framework.module):
 
             self.alert("AVD not found, searching for targets ...")
             targets = Android.get_targets()
-            targets.reverse()
             t = None
             for target in targets:
                 if int(self.apk.get_min_sdk_version()) <= target.api_level <= int(self.apk.get_target_sdk_version()):

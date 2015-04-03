@@ -31,8 +31,10 @@ class Module(framework.module):
                                 framework.Vulnerability.LOW
                             ).__dict__
                         )
-                    output = self.avd.shell("am force-stop %s" % (self.apk.get_package()))
-                    logs += "$ adb shell am force-stop %s \n%s" % (self.apk.get_package(), output)
+                    #force-stop was only introduced in honeycomb
+                    if self.avd.target > 12:
+                        output = self.avd.shell("am force-stop %s" % (self.apk.get_package()))
+                        logs += "$ adb shell am force-stop %s \n%s" % (self.apk.get_package(), output)
         if verbose:
             print logs
 

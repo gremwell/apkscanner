@@ -6,11 +6,11 @@
 		<title>APKScanner Report</title>
 		<meta name="generator" content="Bootply" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<link href="reporting/templates/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link href="../../reporting/templates/dist/css/bootstrap.min.css" rel="stylesheet">
 		<!--[if lt IE 9]>
 			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
-		<link href="reporting/templates/dist/css/styles.css" rel="stylesheet">
+		<link href="../../reporting/templates/dist/css/styles.css" rel="stylesheet">
 	</head>
 	<body>
 <!-- Header -->
@@ -34,7 +34,7 @@
     <div class="col-md-10">
 
       	<div class="row">
-          
+
 	 <div class="col-md-5 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Informations</h4></div>
@@ -67,11 +67,11 @@
 			</div>
 		</div>
 	</div>
-		
+
 	 <div class="col-md-5 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Certificate</h4></div>
-                  	<div class="panel-body">      
+                  	<div class="panel-body">
 			<p><strong>Subject :</strong> {{ data["modules"]["info/certificate"]["run"]["results"]["subject"] }} </p>
 			<p><strong>Serial number :</strong> {{ data["modules"]["info/certificate"]["run"]["results"]["serial_number"] }} </p>
 			<p><strong>Fingerprint :</strong> {{ data["modules"]["info/certificate"]["run"]["results"]["fingerprint"] }} </p>
@@ -94,11 +94,11 @@
 					<tr><td>{{ permission }}</td></tr>
 				{% endfor %}
 				</tbody>
-				</table>		
+				</table>
 			</div>
 		</div>
 	</div>
-	
+
 	<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>Native Code</h4></div>
@@ -116,7 +116,7 @@
 			<p> No native code found. </p>
 			{% endif %}
 
-			
+
 		</div>
 	</div>
 
@@ -147,8 +147,8 @@
 	<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Providers</h4></div>
-                  	<div class="panel-body">      
-		
+                  	<div class="panel-body">
+
 			{% if data["modules"]["permissions/providers"]["run"]["results"]|length %}
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			{% else %}
@@ -176,8 +176,8 @@
 				<p><strong>Grant_uri_permissions :</strong> {{ provider["grant_uri_permissions"] }} </p>
 				<p><strong>Name :</strong> {{ provider["name"] }} </p>
 				<p><strong>Enabled :</strong> {{ provider["enabled"] }} </p>
-				<p><strong>Write permission :</strong> {{ provider["write_permission"] }} </p>			
-	
+				<p><strong>Write permission :</strong> {{ provider["write_permission"] }} </p>
+
 			        <table class="table">
 	    			<thead>
 					<tr><td>URI</td></tr>
@@ -186,9 +186,9 @@
 				{% for uri in provider["uris"] %}
 					<tr><td>{{ uri }}</td></tr>
 				{% endfor %}
-			
+
 				</tbody>
-				</table>		
+				</table>
 					    </div>
   			</div>
 			</div>
@@ -199,7 +199,7 @@
 			{% if data["modules"]["permissions/providers"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
-			</div>	
+			</div>
 		</div>
 	</div>
 
@@ -207,8 +207,8 @@
 	<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Services</h4></div>
-                  	<div class="panel-body">      
-		
+                  	<div class="panel-body">
+
 			{% if data["modules"]["permissions/services"]["run"]["results"]|length %}
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			{% else %}
@@ -242,7 +242,7 @@
 			{% if data["modules"]["permissions/services"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
-			</div>	
+			</div>
 		</div>
 	</div>
 
@@ -270,10 +270,15 @@
 				    <div id="collapse{{ activity["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ activity["name"].replace(".", "") }}">
 				      <div class="panel-body">
 
+                      <div class="col-md-5">
                 <p><strong>Exported :</strong> {{ activity["exported"] }} </p>
                 <p><strong>Permission:</strong> {{ activity["permission"] }} </p>
 				<p><strong>Intent filters :</strong> {{ activity["intent_filters"]|length }} </p>
-
+</div><div class="col-md-5 pull-right">
+                          {% if activity["screenshot"]|length %}
+                          <img src={{ activity["screenshot"] }} />
+                          {% endif %}
+                          </div>
 
 					  </div>
   			</div>
@@ -289,6 +294,9 @@
 			</div>
 		</div>
 	</div>
+
+
+
 
 <div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
@@ -328,17 +336,68 @@
 			{% endif %}
 			</div>
 		</div>
-	</div>
 
+    <div class="col-md-10 col-md-offset-2">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Logcat</h4></div>
+                  	<div class="panel-body">
+                        <textarea rows="20" style="border:none;width:100%;font-family:monospace; background-color:#f5f5f5;">{{ logcat }}</textarea>
+                    </div>
+            </div>
+        </div>
 
+    <div class="col-md-10 col-md-offset-2">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>External storage (SDCard)</h4></div>
+                  	<div class="panel-body">
+                        <pre>{{ external_storage }}</pre>
+                    </div>
+            </div>
+        </div>
 
+    <div class="col-md-10 col-md-offset-2">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Internal Storage</h4></div>
+                  	<div class="panel-body">
+                        <pre>{{ internal_storage }}</pre>
+                    </div>
+            </div>
+        </div>
 
-
+<div class="col-md-10 col-md-offset-2">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>Vulnerabilities</h4></div>
+                  	<div class="panel-body">
+                        <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Severity</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for module in data["modules"] %}
+        {% for vulnerability in data["modules"][module]["run"]["vulnerabilities"] %}
+        <tr class="default">
+          <td>0</td>
+          <td>{{ vulnerability["name"] }}</td>
+          <td>{{ vulnerability["description"] }}</td>
+          <td>{{ vulnerability["level"] }}</td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+      </tbody>
+    </table>
+                    </div>
+            </div>
+        </div>
 <!-- /Main -->
-  
+
 	<!-- script references -->
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-		<script src="reporting/templates/dist/js/bootstrap.min.js"></script>
-		<script src="reporting/templates/dist/js/scripts.js"></script>
+		<script src="../../reporting/templates/dist/js/bootstrap.min.js"></script>
+		<script src="../../reporting/templates/dist/js/scripts.js"></script>
 	</body>
 </html>

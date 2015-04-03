@@ -36,7 +36,7 @@ class Module(framework.module):
                     output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
                     time.sleep(1)
                     self.avd.screenshot("./analysis/%s/screenshots/%s.png" % (self.apk.get_package(), activity["name"]))
-                    activity["screenshot"] = "./analysis/%s/screenshots/%s.png" % (self.apk.get_package(), activity["name"])
+                    activity["screenshot"] = "screenshots/%s.png" % (activity["name"])
                     logs += "$ adb shell am start -n %s/%s\n%s\n" % (self.apk.get_package(), activity["name"], output)
                     if "Error" not in output:
                         activity["vulnerable"] = True
