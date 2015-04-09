@@ -26,4 +26,8 @@ if [ -z `which ndk-build` ]; then
 fi
 echo 'export PATH=$PATH:~/android-sdk-linux/tools:~/android-sdk-linux/platform-tools:~/android-ndk-r10d'  >> ~/.profile
 source ~/.profile
-while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t tools,platform-tools,system-image
+system_image=`android list sdk -a -e | egrep "sys-img-armeabi-v7a-android-[0-9]+" | head -n1 | cut -d' ' -f2`
+sdk_tools=`android list sdk -a -e | grep "\"tools\"" | cut -d' ' -f2`
+build_tools=`android list sdk -a -e | grep "build-tools" | head -n1 | cut -d' ' -f2`
+#APIS=` android list sdk -a -e | egrep "\"android-[0-9]+" | cut -d' ' -f2 | tr '\n' ','`
+while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t $sdk_tools,$build_tools,$system_image
