@@ -53,7 +53,8 @@ class Module(framework.module):
 
             if provider["exported"] and provider["permission"] is None and provider["read_permission"] is None\
                     and provider["write_permission"] is None:
-                if self.avd is not None:
+                #content was introduced in honeycomb
+                if self.avd is not None and self.avd.target > 12:
                     for uri in provider["uris"]:
                         logs += "$ adb shell content query --uri %s\n" % uri
                         logs += self.avd.shell("content query --uri %s" % uri)

@@ -32,18 +32,19 @@ class Module(framework.module):
 
             #TODO: fix timings and menu key
             if not launcher and (activity["exported"] and activity["permission"] is None):
-                output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
-                time.sleep(1)
-                self.avd.screenshot("./analysis/%s/screenshots/%s.png" % (self.apk.get_package(), activity["name"]))
-                activity["screenshot"] = "./analysis/%s/screenshots/%s.png" % (self.apk.get_package(), activity["name"])
-                logs += "$ adb shell am start -n %s/%s\n%s\n" % (self.apk.get_package(), activity["name"], output)
-                if "Error" not in output:
-                    activity["vulnerable"] = True
-                    vulnerabilities.append(
-                        framework.Vulnerability("Potentially vulnerable activity component.",
-                                                "The following activities were found to be vulnerable.",
-                                                framework.Vulnerability.LOW).__dict__
-                    )
+                if self.avd is not None:
+                    output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
+                    time.sleep(1)
+                    self.avd.screenshot("./analysis/%s/screenshots/%s.png" % (self.apk.get_package(), activity["name"]))
+                    activity["screenshot"] = "screenshots/%s.png" % (activity["name"])
+                    logs += "$ adb shell am start -n %s/%s\n%s\n" % (self.apk.get_package(), activity["name"], output)
+                    if "Error" not in output:
+                        activity["vulnerable"] = True
+                        vulnerabilities.append(
+                            framework.Vulnerability("Potentially vulnerable activity component.",
+                                                    "The following activities were found to be vulnerable.",
+                                                    framework.Vulnerability.LOW).__dict__
+                        )
 
         return {
             "results": activities,

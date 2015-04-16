@@ -26,7 +26,7 @@ def main(arguments):
     apks.analyze(module=arguments.module)
     if arguments.report:
         apks.report("html")
-        apks.report("pdf")
+        #apks.report("pdf")
 
 description = '%%(prog)s - %s %s' % (__author__, __email__)
 parser = argparse.ArgumentParser(description=description, version=__version__)

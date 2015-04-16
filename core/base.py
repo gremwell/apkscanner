@@ -20,9 +20,11 @@ from androguard.core import androconf
 from androguard.core.bytecodes import apk
 from android import *
 from scapy import *
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Markup
 from weasyprint import HTML
 import codecs
+
+
 
 
 # define colors for output
@@ -161,24 +163,46 @@ class APKScanner(framework.module):
             self.error(str(e))
 
         if self.avd is not None:
+            self.output("Teleporting data ...")
             self.teleport(self.avd)
-            #1. open pcap file with scapy
-            #pcap = rdpcap('./analysis/%s/file.pcap' % self.apk.get_package())
-            #2. perform analysis
-            #TODO: define analysis vectors
-            # timing analysis, list of target IPs, amount of transmitted data ?
 
             for pid in self.subprocesses:
                 os.kill(pid+1, signal.SIGTERM)
+
             self.output("Stopping network capture ...")
             self.avd.stop_traffic_capture()
             self.output("Uninstalling APK ...")
-            print self.avd.uninstall(self.apk.get_package())
-            #self.output("Shutting down AVD...")
-            #self.avd.shutdown()
+            self.avd.uninstall(self.apk.get_package())
+            self.output("Shutting down AVD...")
+            self.avd.shutdown()
+
         self.analysis["end_time"] = int(time.time())
+        self.summary()
 
-
+    def summary(self):
+        from datetime import date
+        summary = "\n\nAnalysis done - %s - %s" % (self.apk.get_package(), date.today().strftime("%Y%b%d"))
+        summary += "\n\t# Disassembled code location: %s/analysis/%s/code" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        summary += "\n\t# Logcat files location: %s/analysis/%s/logs" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        summary += "\n\t# Network capture: %s/analysis/%s/network" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        summary += "\n\t# Device storage dump: %s/analysis/%s/storagee" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        summary += "\n\t# HTML report: %s/analysis/%s/report.html" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        print summary
 
     def load_apk(self):
         """
@@ -206,20 +230,44 @@ class APKScanner(framework.module):
         Returns:
         Throws:
         """
+        loader = FileSystemLoader("reporting/templates")
+        env = Environment(loader=loader)
         if format == "json":
             with open("./analysis/%s.json" % self.apk.get_package(), "wb") as f:
                 f.write(json.dumps(self.analysis))
         elif format == "html":
-            env = Environment(loader=FileSystemLoader("reporting/templates"))
+            logcat = ""
+            with open("./analysis/%s/logs/logcat_full.log" % (self.apk.get_package())) as f:
+                logcat = f.read()
+
+            def list_files(startpath):
+                s = ""
+                for root, dirs, files in os.walk(startpath):
+                    level = root.replace(startpath, '').count(os.sep)
+                    indent = '\t' * (level)
+                    s += "\n%s<a href='file://%s/%s'>%s</a>/" % (indent, os.path.dirname(os.path.realpath(__file__)), root, os.path.basename(root))
+                    subindent = '\t' * (level + 1)
+                    for l in files:
+                        s += "\n%s<a href='file://%s/%s/%s' >%s</a>" % (subindent, os.path.dirname(os.path.realpath(__file__)), root, l, l)
+                return s
+
+            #internal_storage = list_files("./analysis/%s/storage/data/data" % self.apk.get_package())
+            internal_storage = ""
+            external_storage = list_files("./analysis/%s/storage/sdcard" % self.apk.get_package())
             template = env.get_template("index.html")
-            html_out = template.render(data=self.analysis)
+            html_out = template.render(data=self.analysis, logcat=logcat,
+                                       internal_storage=internal_storage,
+                                       external_storage=external_storage)
             with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
                 f.write(html_out)
             return
         elif format == "pdf":
             env = Environment(loader=FileSystemLoader("reporting/templates"))
+            logcat = ""
+            with open("./analysis/%s/logs/logcat_full.log" % (self.apk.get_package())) as f:
+                logcat = f.read()
             template = env.get_template("index.html")
-            html_out = template.render(data=self.analysis)
+            html_out = template.render(data=self.analysis, logcat=logcat)
             with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
                 f.write(html_out)
                 HTML(string=html_out).write_pdf(
@@ -261,7 +309,7 @@ class APKScanner(framework.module):
 
             self.output("Converting DEX to JAR ...")
             p = subprocess.Popen(
-                './libs/dex2jar/dex2jar ./analysis/%s/orig/classes.dex -f -o ./analysis/%s/code/jar/classes.jar  1>&2' %
+                './libs/dex2jar/dex2jar ./analysis/%s/code/orig/classes.dex -f -o ./analysis/%s/code/jar/classes.jar  1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -273,7 +321,7 @@ class APKScanner(framework.module):
 
             self.output("Converting DEX to SMALI ...")
             p = subprocess.Popen(
-                './libs/baksmali ./analysis/%s/orig/classes.dex -o ./analysis/%s/code/smali 1>&2' %
+                './libs/baksmali ./analysis/%s/code/orig/classes.dex -o ./analysis/%s/code/smali 1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -285,7 +333,7 @@ class APKScanner(framework.module):
 
             self.output("Decompiling JAR file ...")
             p = subprocess.Popen(
-                './libs/jd ./analysis/%s/jar/classes.jar -od ./analysis/%s/code/decompiled 1>&2' %
+                './libs/jd ./analysis/%s/code/jar/classes.jar -od ./analysis/%s/code/decompiled 1>&2' %
                 (self.apk.get_package(), self.apk.get_package()),
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -322,10 +370,8 @@ class APKScanner(framework.module):
             os.mkdir("./analysis/%s/storage/data/system" % (self.apk.get_package()))
 
         source = "/data/data/%s" % self.apk.get_package()
-        dest = "./analysis/%s/storage/data/data" % self.apk.get_package()
+        dest = "./analysis/%s/storage/data/data/%s/" % (self.apk.get_package(), self.apk.get_package())
         avd.pull(source, dest)
-
-        self.output("Teleporting data ...")
 
         #search files owned by the application's user (u0_a46) in the sdcard mount point.
         #1. get application UID
@@ -358,7 +404,6 @@ class APKScanner(framework.module):
 
             self.alert("AVD not found, searching for targets ...")
             targets = Android.get_targets()
-            targets.reverse()
             t = None
             for target in targets:
                 if int(self.apk.get_min_sdk_version()) <= target.api_level <= int(self.apk.get_target_sdk_version()):

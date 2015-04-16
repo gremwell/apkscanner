@@ -71,10 +71,11 @@ class Module(framework.module):
                                 if objdump_bin is not None:
                                     objdump_outfile = "./analysis/%s/code/native/lib%s.objdump" % (self.apk.get_package(), m)
                                     with open(objdump_outfile, "wb") as f:
-                                        exitcode = subprocess.call("%s -D %s" % (objdump_bin, os.path.abspath(path)),
-                                                               shell=True,
-                                                               stdout=f,
-                                                               stderr=subprocess.PIPE
+                                        exitcode = subprocess.call(
+                                            "%s -D %s" % (objdump_bin, os.path.abspath(path)),
+                                            shell=True,
+                                            stdout=f,
+                                            stderr=subprocess.PIPE
                                         )
                                         if exitcode:
                                             raise Exception("An error occured when running objdump on %s" % path)
