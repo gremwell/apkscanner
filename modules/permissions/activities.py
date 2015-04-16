@@ -30,7 +30,6 @@ class Module(framework.module):
                         intfilter["category"] == "android.intent.category.LAUNCHER":
                     launcher = True
 
-            #TODO: fix timings and menu key
             if not launcher and (activity["exported"] and activity["permission"] is None):
                 if self.avd is not None:
                     output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
