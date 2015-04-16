@@ -5,16 +5,23 @@ sys.path.append('./core/')
 from base import APKScanner, __author__, __email__, __version__
 
 
+def header():
+    print
+    print "\t\t    _    ____  _  ______                                     "
+    print "\t\t   / \  |  _ \| |/ / ___|  ___ __ _ _ __  _ __   ___ _ __    "
+    print "\t\t  / _ \ | |_) | ' /\___ \ / __/ _` | '_ \| '_ \ / _ \ '__|   "
+    print "\t\t / ___ \|  __/| . \ ___) | (_| (_| | | | | | | |  __/ |      "
+    print "\t\t/_/   \_\_|   |_|\_\____/ \___\__,_|_| |_|_| |_|\___|_|      "
+    print
+    print "\t\t[apkscanner v%s, %s(%s)]" % (__version__, __author__, __email__)
+    print
+    print "\t\t\t~~ Gremwell bvba - www.gremwell.com ~~"
+    print
+
+
 def main(arguments):
 
-    print
-    print "    _    ____  _  ______                                     "
-    print "   / \  |  _ \| |/ / ___|  ___ __ _ _ __  _ __   ___ _ __    "
-    print "  / _ \ | |_) | ' /\___ \ / __/ _` | '_ \| '_ \ / _ \ '__|   "
-    print " / ___ \|  __/| . \ ___) | (_| (_| | | | | | | |  __/ |      "
-    print "/_/   \_\_|   |_|\_\____/ \___\__,_|_| |_|_| |_|\___|_|      "
-    print
-
+    header()
     apks = APKScanner(arguments)
     apks.analyze(module=arguments.module)
     if arguments.report:

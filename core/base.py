@@ -1,4 +1,4 @@
-__author__ = 'Quentin Kaiser (@QKaiser)'
+__author__ = 'Quentin Kaiser'
 __email__ = 'quentin@gremwell.com'
 execfile('VERSION')
 import __builtin__
