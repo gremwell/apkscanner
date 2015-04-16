@@ -80,6 +80,7 @@ class APKScanner(framework.module):
         self.load_modules()
         self.static_only = options.static_only
         self.verbose = options.verbose
+        self.headless = options.headless
 
     def on_boot(self, avd):
         self.alert("AVD is up")
@@ -119,7 +120,7 @@ class APKScanner(framework.module):
             self.avd = self.find_avd()
             if not self.avd.isrunning:
                 self.output("Launching new emulator [%s]" % self.avd.name)
-                self.avd.launch(self.on_boot, headless=False)
+                self.avd.launch(self.on_boot, headless=self.headless)
             else:
                 self.output("AVD found [emulator-%d running %s]" % (self.avd._id, self.avd.name))
                 self.deploy()
