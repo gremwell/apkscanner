@@ -163,24 +163,46 @@ class APKScanner(framework.module):
             self.error(str(e))
 
         if self.avd is not None:
+            self.output("Teleporting data ...")
             self.teleport(self.avd)
-            #1. open pcap file with scapy
-            #pcap = rdpcap('./analysis/%s/file.pcap' % self.apk.get_package())
-            #2. perform analysis
-            #TODO: define analysis vectors
-            # timing analysis, list of target IPs, amount of transmitted data ?
 
             for pid in self.subprocesses:
                 os.kill(pid+1, signal.SIGTERM)
+
             self.output("Stopping network capture ...")
             self.avd.stop_traffic_capture()
             self.output("Uninstalling APK ...")
-            print self.avd.uninstall(self.apk.get_package())
-            #self.output("Shutting down AVD...")
-            #self.avd.shutdown()
+            self.avd.uninstall(self.apk.get_package())
+            self.output("Shutting down AVD...")
+            self.avd.shutdown()
+
         self.analysis["end_time"] = int(time.time())
+        self.summary()
 
-
+    def summary(self):
+        from datetime import date
+        summary = "\n\nAnalysis done - %s - %s" % (self.apk.get_package(), date.today().strftime("%Y%b%d"))
+        summary += "\n\t# Disassembled code location: %s/analysis/%s/code" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        summary += "\n\t# Logcat files location: %s/analysis/%s/logs" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        summary += "\n\t# Network capture: %s/analysis/%s/network" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        summary += "\n\t# Device storage dump: %s/analysis/%s/storagee" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        summary += "\n\t# HTML report: %s/analysis/%s/report.html" % (
+            os.path.dirname(os.path.realpath(__file__)),
+            self.apk.get_package()
+        )
+        print summary
 
     def load_apk(self):
         """
@@ -350,8 +372,6 @@ class APKScanner(framework.module):
         source = "/data/data/%s" % self.apk.get_package()
         dest = "./analysis/%s/storage/data/data/%s/" % (self.apk.get_package(), self.apk.get_package())
         avd.pull(source, dest)
-
-        self.output("Teleporting data ...")
 
         #search files owned by the application's user (u0_a46) in the sdcard mount point.
         #1. get application UID
