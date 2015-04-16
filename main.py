@@ -7,6 +7,14 @@ from base import APKScanner, __author__, __email__, __version__
 
 def main(arguments):
 
+    print
+    print "    _    ____  _  ______                                     "
+    print "   / \  |  _ \| |/ / ___|  ___ __ _ _ __  _ __   ___ _ __    "
+    print "  / _ \ | |_) | ' /\___ \ / __/ _` | '_ \| '_ \ / _ \ '__|   "
+    print " / ___ \|  __/| . \ ___) | (_| (_| | | | | | | |  __/ |      "
+    print "/_/   \_\_|   |_|\_\____/ \___\__,_|_| |_|_| |_|\___|_|      "
+    print
+
     apks = APKScanner(arguments)
     apks.analyze(module=arguments.module)
     if arguments.report:
