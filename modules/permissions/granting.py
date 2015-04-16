@@ -326,29 +326,6 @@ class Module(framework.module):
             for permission in results["app_permissions"]:
                 print "\t%s" % permission
 
-        undergranting = [x for x in results["app_permissions"]
-                         if x in permissions and permissions[x]["protection_level"] != "normal" and x not in results["manifest_permissions"]]
-        overgranting = [x for x in results["manifest_permissions"]
-                        if x in permissions and permissions[x]["protection_level"] != "normal" and x not in results["app_permissions"]]
-
-        if len(undergranting):
-            vulnerabilities.append(framework.Vulnerability(
-                "Application permissions undergranting.",
-                "The application is using permissions that have not been requested in the application manifest. "
-                "This could lead to application error and security hazard."
-                "The following permissions are undergranted:\n%s" % ("\n".join(undergranting)),
-                framework.Vulnerability.LOW
-            ).__dict__)
-
-        if len(overgranting):
-            vulnerabilities.append(framework.Vulnerability(
-                "Application permissions overgranting.",
-                "The application is requesting more permissions than needed in the manifest. While it is not really a"
-                "vulnerability, this behaviour is not good."
-                "The following permissions are overgranted:\n%s" % ("\n".join(overgranting)),
-                framework.Vulnerability.LOW
-            ).__dict__)
-
         return {
             "results": results,
             "logs": logs,
