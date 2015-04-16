@@ -119,7 +119,7 @@ class APKScanner(framework.module):
             self.avd = self.find_avd()
             if not self.avd.isrunning:
                 self.output("Launching new emulator [%s]" % self.avd.name)
-                self.avd.launch(self.on_boot, headless=True)
+                self.avd.launch(self.on_boot, headless=False)
             else:
                 self.output("AVD found [emulator-%d running %s]" % (self.avd._id, self.avd.name))
                 self.deploy()
@@ -163,6 +163,8 @@ class APKScanner(framework.module):
             self.error(str(e))
 
         if self.avd is not None:
+            self.alert("Execute manual testing then hit <Enter>. We'll see if you can beat me at finding vulns ...")
+            raw_input("")
             self.output("Teleporting data ...")
             self.teleport(self.avd)
 
