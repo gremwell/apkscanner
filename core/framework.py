@@ -73,10 +73,10 @@ class module(object):
             else:
                 return False
         except KeyError:
-            if len(element.getElementsByTagName("intent-filter")) > 0:
-                return True
-            else:
+            if self.get_min_sdk() > 16:
                 return False
+            else:
+                return True
 
     def _get_label(self, element):
         try:
@@ -160,6 +160,17 @@ class module(object):
 
         return intentfilters
 
+    def get_min_sdk(self):
+        application = self.manifest.getElementsByTagName("application")[0]
+        sdk = application.getElementsByTagName("uses-sdk")
+        if len(sdk) and "android:minSdkVersion" in sdk[0].attributes:
+            return sdk.attributes["android:minSdkVersion"]
+        else:
+            # "If you do not declare this attribute, the system assumes a default value of "1", which indicates that your
+            # application is compatible with all versions of Android."
+            # - http://developer.android.com/guide/topics/manifest/uses-sdk-element.html
+            return 1
+
     def get_activities(self):
         activities = []
         application = self.manifest.getElementsByTagName("application")[0]
@@ -210,7 +221,7 @@ class module(object):
         for provider in application.getElementsByTagName("provider"):
             providers.append({
                 "enabled": True if self._is_enabled(provider) else False,
-                "exported": True if self._is_exported(provider) else False,
+                "exported": self._is_exported(provider),
                 "label": self._get_label(provider),
                 "name": provider.attributes["android:name"].value,
                 "process": self._get_process(provider),
