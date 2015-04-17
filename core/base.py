@@ -415,9 +415,12 @@ class APKScanner(framework.module):
                     t = target
                     break
             if t is None:
-                self.alert("Can't find a target, installing necessary target (it can take time) ...")
+                self.alert("Can't find a target, installing necessary target and ABI (it can take time) ...")
                 p = subprocess.Popen(
-                    "android update sdk -u -t android-%s" % self.apk.get_target_sdk_version(),
+                    "android update sdk -u -t android-%s sys-img-armeabi-v7a-android-%s" % (
+                        self.apk.get_target_sdk_version(),
+                        self.apk.get_target_sdk_version()
+                    ),
                     shell=True,
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,
