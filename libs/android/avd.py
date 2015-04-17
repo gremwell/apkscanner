@@ -264,6 +264,31 @@ class AVD(object):
         )
         return p.pid
 
+
+    #TODO: check API version. adb backup is only available since API ?? (I'd guess 16)
+    def backup(self, package, location=None):
+        """
+        Backup an Android Virtual Device to match the folders of a new SDK.
+        """
+        if self.target >= 16:
+            p = subprocess.Popen(
+                "adb -s emulator-%d backup %s %s" % (
+                    self._id,
+                    "-f %s" % location if location is not None else "",
+                    package
+                ),
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            stdout, stderr = p.communicate()
+            if stderr:
+                raise Exception(stderr)
+            else:
+                return stdout
+        else:
+            raise Exception("ADB backup is not available with devices running Android API prior to ??")
+
     def start_traffic_capture(self, pcap_file):
         """
         Launch traffic capture via exposed console.
