@@ -5,6 +5,20 @@ from androguard.core.analysis.analysis import *
 from androguard.decompiler.dad import decompile
 import re
 
+'''
+Method                                  Default value           Implication of being enabled
+
+setAllowContentAccess                   true                    WebView has access to content providers on the system
+setAllowFileAccess                      true                    Allows a WebView to load content from the filesystem using file:// scheme
+setAllowFileAccessFromFileURLS          true (<= API 15)        Allows the HTML file that was loaded using file:// scheme to access
+                                                                other files on the system
+setAllowUniversalAccessFromFilesURLS    true (<= API 15)        Allows the HTML file that was loaded using file:// to
+                                                                access content from any origin (including other files).
+setJavascriptEnabled                    false                   Allows the WebView to execute Javascript
+setPluginState                          PluginState.OFF         Allow the loading of plugins (ie. Flash)
+setSavePassword (deprecated as API18)   true                    The WebView will save passwords entered
+'''
+
 
 class Module(framework.module):
     def __init__(self, apk, avd):
@@ -26,6 +40,7 @@ class Module(framework.module):
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
         dx = VMAnalysis(d)
+
 
         z = dx.tainted_packages.search_methods(".", "setJavaScriptEnabled", ".")
         for p in z:
@@ -80,6 +95,7 @@ class Module(framework.module):
                         if w["file"] == method.get_class_name()[1:-1]:
                             if method.get_debug().get_line_start() not in w["lines"]:
                                 w["lines"].append(method.get_debug().get_line_start())
+
 
 
         if len(webviews["plugin"]) and len(webviews["javascript"]):
