@@ -407,7 +407,7 @@ class APKScanner(framework.module):
                     return avd
 
             self.alert("AVD not found, searching for targets ...")
-            targets = Android.get_targets()
+            targets = [] #Android.get_targets()
             t = None
             for target in targets:
                 if int(self.apk.get_min_sdk_version()) <= target.api_level <= int(self.apk.get_target_sdk_version()):
@@ -417,7 +417,7 @@ class APKScanner(framework.module):
             if t is None:
                 self.alert("Can't find a target, installing necessary target and ABI (it can take time) ...")
                 p = subprocess.Popen(
-                    "android update sdk -u -t android-%s sys-img-armeabi-v7a-android-%s" % (
+                    "android update sdk -a -u -t android-%s,sys-img-armeabi-v7a-android-%s" % (
                         self.apk.get_target_sdk_version(),
                         self.apk.get_target_sdk_version()
                     ),
@@ -434,16 +434,14 @@ class APKScanner(framework.module):
                     if "Unknown Host" in stdout:
                         self.error("Missing internet connectivity. Aborting...")
                     else:
-                        self.alert("Necessary target installed.")
-                        targets = Android.get_targets()
-                        targets.reverse()
-                        for target in targets:
-                            if int(self.apk.get_min_sdk_version()) <= target.api_level <= \
-                                    int(self.apk.get_target_sdk_version()):
-                                t = target
-                            break
-
-            #NOTE: choosing default device, might be a better solution
+                	self.alert("Necessary target installed.")
+	                targets = Android.get_targets()
+			targets = Android.get_targets()
+			for target in targets:
+			    if int(self.apk.get_min_sdk_version()) <= target.api_level <= \
+	                    	int(self.apk.get_target_sdk_version()):
+		                    t = target
+        	                    break
             self.alert("Creating AVD... [%s, %s, %s]" % (Android.get_devices()[0].id, t.api_level, t.skins.split(",")[0]))
             name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
             while name in [avd.name for avd in Android.get_avds()]:
