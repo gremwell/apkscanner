@@ -37,3 +37,4 @@ build_tools=`android list sdk -a -e | grep "build-tools" | head -n1 | cut -d' ' 
 platforms=`android list sdk -a -e | grep -E "android-[0-9]{1,2}" | head -n1 | cut -d' ' -f2`
 echo $platforms
 while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t $platform_tools,$build_tools,$sdk_tools,$platforms,$system_image_arm,$system_image_x86,$system_image_x86_64
+exit 0
