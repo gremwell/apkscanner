@@ -73,10 +73,10 @@ class module(object):
             else:
                 return False
         except KeyError:
-            if self.get_min_sdk() > 16:
-                return False
-            else:
+            if element.getElementsByTagName("intent-filter"):
                 return True
+            else:
+                return False
 
     def _get_label(self, element):
         try:
@@ -219,9 +219,12 @@ class module(object):
         providers = []
         application = self.manifest.getElementsByTagName("application")[0]
         for provider in application.getElementsByTagName("provider"):
+            exported = self._is_exported(provider)
+            if not exported and self.get_min_sdk <= 16:
+                exported = True
             providers.append({
                 "enabled": True if self._is_enabled(provider) else False,
-                "exported": self._is_exported(provider),
+                "exported": exported,
                 "label": self._get_label(provider),
                 "name": provider.attributes["android:name"].value,
                 "process": self._get_process(provider),
