@@ -205,6 +205,7 @@ class APKScanner(framework.module):
             os.path.dirname(os.path.realpath(__file__)),
             self.apk.get_package()
         )
+        summary += "\n\n"
         print summary
 
     def load_apk(self):
@@ -416,9 +417,7 @@ class APKScanner(framework.module):
             if t is None:
                 self.alert("Can't find a target, installing necessary target (it can take time) ...")
                 p = subprocess.Popen(
-                    "android update sdk -u -t %s" %
-                    ",".join([str(x) for x in xrange(int(self.apk.get_min_sdk_version()),
-                                                     int(self.apk.get_target_sdk_version())+1)]),
+                    "android update sdk -u -t android-%s" % self.apk.get_target_sdk_version(),
                     shell=True,
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,
