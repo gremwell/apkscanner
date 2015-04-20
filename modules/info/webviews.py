@@ -95,7 +95,6 @@ class Module(framework.module):
                     framework.Vulnerability.LOW
                 ).__dict__)
 
-        print vulnerabilities
         return {
             "results": webviews,
             "logs": "",
