@@ -3,7 +3,6 @@ Jinja2==2.7.3
 M2Crypto==0.22.3
 MarkupSafe==0.23
 Pyphen==0.9.1
-WeasyPrint==0.23
 argparse==1.2.1
 backports.ssl-match-hostname==3.4.0.2
 cairocffi==0.6
