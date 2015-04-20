@@ -62,7 +62,15 @@ class Module(framework.module):
             "logs": logs,
             "vulnerabilities": [framework.Vulnerability(
                 "The application allow backups.",
-                "TODO",
-                framework.Vulnerability.MEDIUM
+                "The allowBackup attribute determines if an application's data can be backed up and restored.\n"
+                "By default, this flag is set to true. When this flag is set to true, application data can be backed up"
+                " and restored by the user using adb backup and adb restore. This may have security consequences for an"
+                " application. adb backup allows users who have enabled USB debugging to copy application data off of"
+                " the device. Once backed up, all application data can be read by the user. adb restore allows creation"
+                " of application data from a source specified by the user. Following a restore, applications should not"
+                " assume that the data, file permissions, and directory permissions were created by the application"
+                " itself. Setting allowBackup=\"false\" opts an application out of both backup and restore."
+                "\n\n",
+                framework.Vulnerability.LOW
             ).__dict__] if results["allow_backup"] is True else []
         }
