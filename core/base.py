@@ -19,9 +19,7 @@ import framework
 from androguard.core import androconf
 from androguard.core.bytecodes import apk
 from android import *
-from scapy import *
-from jinja2 import Environment, FileSystemLoader, Markup
-from weasyprint import HTML
+from jinja2 import Environment, FileSystemLoader
 import codecs
 
 
@@ -184,24 +182,24 @@ class APKScanner(framework.module):
 
     def summary(self):
         from datetime import date
-        summary = "\n\nAnalysis done - %s - %s" % (self.apk.get_package(), date.today().strftime("%Y%b%d"))
-        summary += "\n\t# Disassembled code location: %s/analysis/%s/code" % (
+        summary = "\n\n Analysis done - %s - %s\n" % (self.apk.get_package(), date.today().strftime("%Y%m%d"))
+        summary += "\n\t* Disassembled code: %s/analysis/%s/code" % (
             os.path.dirname(os.path.realpath(__file__)),
             self.apk.get_package()
         )
-        summary += "\n\t# Logcat files location: %s/analysis/%s/logs" % (
+        summary += "\n\t* Logcat files: %s/analysis/%s/logs" % (
             os.path.dirname(os.path.realpath(__file__)),
             self.apk.get_package()
         )
-        summary += "\n\t# Network capture: %s/analysis/%s/network" % (
+        summary += "\n\t* Network capture: %s/analysis/%s/network" % (
             os.path.dirname(os.path.realpath(__file__)),
             self.apk.get_package()
         )
-        summary += "\n\t# Device storage dump: %s/analysis/%s/storagee" % (
+        summary += "\n\t* Device storage dump: %s/analysis/%s/storagee" % (
             os.path.dirname(os.path.realpath(__file__)),
             self.apk.get_package()
         )
-        summary += "\n\t# HTML report: %s/analysis/%s/report.html" % (
+        summary += "\n\t* HTML report: %s/analysis/%s/report.html" % (
             os.path.dirname(os.path.realpath(__file__)),
             self.apk.get_package()
         )
@@ -228,7 +226,7 @@ class APKScanner(framework.module):
         except Exception as e:
             self.error(str(e))
 
-    def report(self, format="json"):
+    def report(self, fmt="json"):
         """Save analysis results as JSON data in analysis directory.
         Params:
         Returns:
@@ -236,10 +234,10 @@ class APKScanner(framework.module):
         """
         loader = FileSystemLoader("reporting/templates")
         env = Environment(loader=loader)
-        if format == "json":
+        if fmt == "json":
             with open("./analysis/%s.json" % self.apk.get_package(), "wb") as f:
                 f.write(json.dumps(self.analysis))
-        elif format == "html":
+        elif fmt == "html":
             logcat = ""
             with open("./analysis/%s/logs/logcat_full.log" % (self.apk.get_package())) as f:
                 logcat = f.read()
@@ -264,20 +262,6 @@ class APKScanner(framework.module):
                                        external_storage=external_storage)
             with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
                 f.write(html_out)
-            return
-        elif format == "pdf":
-            env = Environment(loader=FileSystemLoader("reporting/templates"))
-            logcat = ""
-            with open("./analysis/%s/logs/logcat_full.log" % (self.apk.get_package())) as f:
-                logcat = f.read()
-            template = env.get_template("index.html")
-            html_out = template.render(data=self.analysis, logcat=logcat)
-            with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
-                f.write(html_out)
-                HTML(string=html_out).write_pdf(
-                    "./analysis/%s/report.pdf" % (self.apk.get_package()),
-                    stylesheets=["reporting/templates/dist/css/bootstrap.min.css"]
-                )
             return
         else:
             raise Exception("Unsupported report format.")
@@ -434,14 +418,14 @@ class APKScanner(framework.module):
                     if "Unknown Host" in stdout:
                         self.error("Missing internet connectivity. Aborting...")
                     else:
-                	self.alert("Necessary target installed.")
-	                targets = Android.get_targets()
-			targets = Android.get_targets()
-			for target in targets:
-			    if int(self.apk.get_min_sdk_version()) <= target.api_level <= \
-	                    	int(self.apk.get_target_sdk_version()):
-		                    t = target
-        	                    break
+                        self.alert("Necessary target installed.")
+                        targets = Android.get_targets()
+                        targets = Android.get_targets()
+                        for target in targets:
+                            if int(self.apk.get_min_sdk_version()) <= target.api_level <= \
+                                    int(self.apk.get_target_sdk_version()):
+                                t = target
+                                break
             self.alert("Creating AVD... [%s, %s, %s]" % (Android.get_devices()[0].id, t.api_level, t.skins.split(",")[0]))
             name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
             while name in [avd.name for avd in Android.get_avds()]:
