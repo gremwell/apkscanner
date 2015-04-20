@@ -52,7 +52,7 @@ class Module(framework.module):
                 else:
                     self.warning("Emulator running in headless mode. Can't run automated backup script.")
             except Exception as e:
-                self.warning(e)
+                self.warning(str(e.message))
 
         return {
             "results": results,
