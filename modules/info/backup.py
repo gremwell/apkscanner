@@ -31,23 +31,26 @@ class Module(framework.module):
         if results["allow_backup"] and self.avd is not None:
             try:
                 self.output("Application allow backup. Backing up data ...")
-                backup_location = "./analysis/%s/storage/backup" % self.apk.get_package()
-                if not os.path.exists(backup_location):
-                    os.mkdir(backup_location)
-                if self.avd.backup(self.apk.get_package(), location="%s/backup.ab" % backup_location):
-                    self.output(str("Package backed up to %s, decompressing ..." % backup_location))
-                    ab_file = open("%s/backup.ab" % backup_location, "rb")
-                    tar_file = open("%s/backup.tar" % backup_location, "wb")
-                    ab_file.read(24)
-                    tar_file.write(zlib.decompress(ab_file.read()))
-                    tar_file.close()
-                    ab_file.close()
+                if not self.avd.headless:
+                    backup_location = "./analysis/%s/storage/backup" % self.apk.get_package()
+                    if not os.path.exists(backup_location):
+                        os.mkdir(backup_location)
+                    if self.avd.backup(self.apk.get_package(), location="%s/backup.ab" % backup_location):
+                        self.output(str("Package backed up to %s, decompressing ..." % backup_location))
+                        ab_file = open("%s/backup.ab" % backup_location, "rb")
+                        tar_file = open("%s/backup.tar" % backup_location, "wb")
+                        ab_file.read(24)
+                        tar_file.write(zlib.decompress(ab_file.read()))
+                        tar_file.close()
+                        ab_file.close()
 
-                    tar = tarfile.open("%s/backup.tar" % backup_location)
-                    tar.extractall(path=backup_location)
-                    tar.close()
+                        tar = tarfile.open("%s/backup.tar" % backup_location)
+                        tar.extractall(path=backup_location)
+                        tar.close()
+                    else:
+                        self.warning("An error occured when trying to backup %s" % self.apk.get_package())
                 else:
-                    self.warning("An error occured when trying to backup %s" % self.apk.get_package())
+                    self.warning("Emulator running in headless mode. Can't run automated backup script.")
             except Exception as e:
                 self.warning(e)
 

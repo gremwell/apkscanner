@@ -19,6 +19,7 @@ class AVD(object):
         self._skin = skin
         self._sdcard = sdcard
         self._port = 5554
+        self._headless = False
 
     @staticmethod
     def create(name, target, device, path=None, tag_abi="default/armeabi", skin=None, sdcard=None):
@@ -100,6 +101,7 @@ class AVD(object):
             callback: callback called when the emulator boot is finished.
         Returns:
         """
+        self._headless = headless
         if self._name is not None:
             if self._id is None:
                 self._id = 5554
@@ -265,7 +267,6 @@ class AVD(object):
         return p.pid
 
 
-    #TODO: check API version. adb backup is only available since API ?? (I'd guess 16)
     def backup(self, package, location=None):
         """
         Backup an Android Virtual Device to match the folders of a new SDK.
@@ -282,12 +283,14 @@ class AVD(object):
                 stderr=subprocess.PIPE
             )
             stdout, stderr = p.communicate()
+            print stdout, stderr
+            print self.shell("input tap %d %d" % (self.width - 5, self.height - 5))
             if stderr:
                 raise Exception(stderr)
             else:
                 return stdout
         else:
-            raise Exception("ADB backup is not available with devices running Android API prior to ??")
+            raise Exception("ADB backup is not available with devices running Android API prior to version 16.")
 
     def start_traffic_capture(self, pcap_file):
         """
@@ -330,6 +333,24 @@ class AVD(object):
 
     def unlock(self):
         self.shell("input keyevent 82")
+
+    @property
+    def headless(self):
+        return self._headless
+
+    @headless.setter
+    def headless(self, value):
+        self._headless = value
+
+    @property
+    def width(self):
+        size = self.shell("dumpsys window | \> sed -n '/mUnrestrictedScreen/ s/^.*) \([0-9][0-9]*\)x\([0-9][0-9]*\)/\1 \2/p'")
+        return size.split(" ")[0]
+
+    @property
+    def height(self):
+        size = self.shell("dumpsys window | \> sed -n '/mUnrestrictedScreen/ s/^.*) \([0-9][0-9]*\)x\([0-9][0-9]*\)/\1 \2/p'")
+        return size.split(" ")[1]
 
     @property
     def name(self):
