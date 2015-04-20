@@ -37,6 +37,8 @@ class Module(framework.module):
                         os.mkdir(backup_location)
                     if self.avd.backup(self.apk.get_package(), location="%s/backup.ab" % backup_location):
                         self.output(str("Package backed up to %s, decompressing ..." % backup_location))
+
+                        #zlib decompression
                         ab_file = open("%s/backup.ab" % backup_location, "rb")
                         tar_file = open("%s/backup.tar" % backup_location, "wb")
                         ab_file.read(24)
@@ -44,6 +46,7 @@ class Module(framework.module):
                         tar_file.close()
                         ab_file.close()
 
+                        #tar decompression
                         tar = tarfile.open("%s/backup.tar" % backup_location)
                         tar.extractall(path=backup_location)
                         tar.close()
