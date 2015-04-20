@@ -286,7 +286,7 @@ class AVD(object):
                 time.sleep(1)
             return True
         else:
-            raise Exception("ADB backup is not available with devices running Android API prior to version 16.")
+            raise Exception("ADB backup is not available to devices running Android API prior to version 16.")
 
     def start_traffic_capture(self, pcap_file):
         """
