@@ -1,7 +1,7 @@
 import subprocess
 import time
 from emulator import Emulator
-
+import re
 
 class AVD(object):
     """
@@ -266,7 +266,6 @@ class AVD(object):
         )
         return p.pid
 
-
     def backup(self, package, location=None):
         """
         Backup an Android Virtual Device to match the folders of a new SDK.
@@ -282,13 +281,10 @@ class AVD(object):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
-            stdout, stderr = p.communicate()
-            print stdout, stderr
-            print self.shell("input tap %d %d" % (self.width - 5, self.height - 5))
-            if stderr:
-                raise Exception(stderr)
-            else:
-                return stdout
+            while p.poll() is None:
+                self.shell("input tap %d %d" % (self.width - 5, self.height - 5))
+                time.sleep(1)
+            return True
         else:
             raise Exception("ADB backup is not available with devices running Android API prior to version 16.")
 
@@ -344,13 +340,21 @@ class AVD(object):
 
     @property
     def width(self):
-        size = self.shell("dumpsys window | \> sed -n '/mUnrestrictedScreen/ s/^.*) \([0-9][0-9]*\)x\([0-9][0-9]*\)/\1 \2/p'")
-        return size.split(" ")[0]
+        dumpsys = self.shell("dumpsys window")
+        sizes = re.findall(r"mUnrestrictedScreen=\(\d+,\d+\) (\d+)x(\d+)", dumpsys)
+        if len(sizes):
+            return int(sizes[0][0])
+        else:
+            return 0
 
     @property
     def height(self):
-        size = self.shell("dumpsys window | \> sed -n '/mUnrestrictedScreen/ s/^.*) \([0-9][0-9]*\)x\([0-9][0-9]*\)/\1 \2/p'")
-        return size.split(" ")[1]
+        dumpsys = self.shell("dumpsys window")
+        sizes = re.findall(r"mUnrestrictedScreen=\(\d+,\d+\) (\d+)x(\d+)", dumpsys)
+        if len(sizes):
+            return int(sizes[0][1])
+        else:
+            return 0
 
     @property
     def name(self):
