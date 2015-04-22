@@ -10,8 +10,12 @@
 		<!--[if lt IE 9]>
 			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
-		<link href="../../reporting/templates/dist/css/styles.css" rel="stylesheet">
-	</head>
+
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+        <link href="../../reporting/templates/dist/css/file-tree.min.css" rel="stylesheet">
+        <link href="../../reporting/templates/dist/css/styles.css" rel="stylesheet">
+    </head>
 	<body>
 <!-- Header -->
 <div id="top-nav" class="navbar navbar-inverse navbar-static-top">
@@ -45,7 +49,8 @@
 			<p><strong>Platform: </strong> {{ data["modules"]["info/app"]["run"]["results"]["platform"]["version"] }} - {{ data["modules"]["info/app"]["run"]["results"]["platform"]["name"] }}  </p>
 			<!-- <img src="{{ data["modules"]["info/app"]["run"]["results"]["icon"]}}" alt="app icon" /> -->
 			<p><strong>Debuggable: </strong> {{  "<span class=\"label label-danger\">True</span>" if data["modules"]["info/debuggable"] else "<span class=\"label label-success\">False</span>" }} </p>
-			<p><strong>Obfuscation: </strong> {{ data["modules"]["info/obfuscation"]["run"]["results"] }} </p>
+			<p><strong>Allow Backups: </strong> {{ data["modules"]["info/backup"]["run"]["results"]["allow_backup"] }} </p>
+            <p><strong>Obfuscation: </strong> {{ data["modules"]["info/obfuscation"]["run"]["results"] }} </p>
         </div>
 	</div>
 </div>
@@ -66,10 +71,7 @@
 
 			</div>
 		</div>
-	</div>
-
-	 <div class="col-md-5 col-md-offset-2">
-		<div class="panel panel-default">
+         <div class="panel panel-default">
                 	<div class="panel-heading"><h4>Certificate</h4></div>
                   	<div class="panel-body">
 			<p><strong>Subject :</strong> {{ data["modules"]["info/certificate"]["run"]["results"]["subject"] }} </p>
@@ -82,20 +84,94 @@
 			<p><strong>Public key</strong></p>
 			<pre>{{ data["modules"]["info/certificate"]["run"]["results"]["pubkey"] }}</pre>
 			</div>
-		</div>
+	</div>
 	</div>
 
-	<div class="col-md-5">
-		<div class="panel panel-default">
+	</div>
+    <div class="col-md-10 col-md-offset-2">
+
+        <div class="panel panel-default">
 			<div class="panel-heading"><h4>Permissions</h4></div>
-				<table class="table">
-	  			<tbody>
-				{% for permission in data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"] %}
-					<tr><td>{{ permission }}</td></tr>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>PERMISSION</th>
+                    <th>INFO </th>
+					<th>DESCRIPTION</th>
+                    <th>STATUS</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set labels = {"signatureOrSystem": "warning", "unknown": "default", "dangerous": "danger", "normal": "info"} %}
+                {% for name in data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"] %}
+				    {% set label = "btn btn-%s" % labels[data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["status"]] %}
+                    <tr>
+                        <td>{{ name }}</td>
+                        <td>{{ data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["info"] }}</td>
+                        <td>{{ data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["description"] }}</td>
+                        <td>
+                            <div class="{{ label }}" style="width:100%;">
+                            {{data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["status"] }}
+                            </div>
+                        </td>
+                    </tr>
 				{% endfor %}
 				</tbody>
 				</table>
 			</div>
+        </div>
+    <div class="col-md-10 col-md-offset-2">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>Dissassembled Code</h4></div>
+            <div class="panel-body">
+            <div class="row">
+                <div class="col-sm-6 col-md-3">
+                    <div class="thumbnail">
+                        <img src="http://placehold.it/150x150" alt="java">
+
+                        <div class="caption">
+                            <h3>Java</h3>
+                            <p>Disassembled Java code</p>
+                            <p><a href="#" class="btn btn-primary" role="button">View</a> <a href="#" class="btn btn-default" role="button">Download</a></p>
+                        </div>
+                    </div>
+                  </div>
+                 <div class="col-sm-6 col-md-3">
+                    <div class="thumbnail">
+                        <img src="http://placehold.it/150x150" alt="java">
+
+                        <div class="caption">
+                            <h3>Smali</h3>
+                            <p>Disassembled Smali</p>
+                            <p><a href="#" class="btn btn-primary" role="button">View</a> <a href="#" class="btn btn-default" role="button">Download</a></p>
+                        </div>
+                    </div>
+                  </div>
+
+                 <div class="col-sm-6 col-md-3">
+                    <div class="thumbnail">
+                        <img src="http://placehold.it/150x150" alt="java">
+
+                        <div class="caption">
+                            <h3>Jar</h3>
+                            <p>Jar</p>
+                            <p><a href="#" class="btn btn-default" role="button">Download</a></p>
+                        </div>
+                    </div>
+                  </div>
+                <div class="col-sm-6 col-md-3">
+                    <div class="thumbnail">
+                        <img src="http://placehold.it/150x150" alt="java">
+
+                        <div class="caption">
+                            <h3>DEX</h3>
+                            <p>DEX</p>
+                            <p><a href="#" class="btn btn-default" role="button">Download</a></p>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
 		</div>
 	</div>
 
@@ -104,8 +180,15 @@
 			<div class="panel-heading"><h4>Native Code</h4></div>
 
             {% if data["modules"]["info/native"]["run"]["results"]|length %}
-                <table class="table">
-                <thead><td>Name</td><td>Path</td><td>Arch</td><td>Info</td></thead>
+                 <table class="table table-bordered table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>PATH</th>
+                    <th>ARCH </th>
+					<th>DESCRIPTION</th>
+                </tr>
+                </thead>
                 <tbody>
                 {% for lib in data["modules"]["info/native"]["run"]["results"] %}
                     <tr><td>{{ lib["name"] }}</td><td>{{ lib["path"] }}</td><td>{{ lib["arch"] }}</td><td>{{ lib["info"] }}</td></tr>
@@ -113,7 +196,10 @@
                 </tbody>
                 </table>
 			{% else %}
-			<p> No native code found. </p>
+            <div class="panel-body">
+            <p> No native code found. </p>
+            </div>
+
 			{% endif %}
 
 
@@ -123,36 +209,42 @@
         <div class="col-md-10 col-md-offset-2">
             <div class="panel panel-default">
                 	<div class="panel-heading"><h4>System Services</h4></div>
-                  	<div class="panel-body">
+
                         {% if data["modules"]["info/system_services"]["run"]["results"]|length %}
-                 <table class="table">
-	    			<thead>
-                    <tr><td>Name</td><td>Calls</td></tr>
-				</thead>
-	  			<tbody>
+                  <table class="table table-bordered table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>CALL</th>
+                </tr>
+                </thead>
+                <tbody>
                 {% for system_service in data["modules"]["info/system_services"]["run"]["results"] %}
                     <tr><td>{{ system_service }}</td><td>0</td></tr>
 				{% endfor %}
 				</tbody>
 				</table>
 			{% else %}
-			<p> No service call found. </p>
+                <div class="panel-body">
+			        <p> No service call found. </p>
+                </div>
 			{% endif %}
 
 
-            </div></div></div>
+            </div></div>
 
 
 
 	<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Providers</h4></div>
-                  	<div class="panel-body">
 
 			{% if data["modules"]["permissions/providers"]["run"]["results"]|length %}
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			{% else %}
+                <div class="panel-body">
 			<p> No providers found. </p>
+                    </div>
 			{% endif %}
 
 			{% for provider in data["modules"]["permissions/providers"]["run"]["results"] %}
@@ -160,12 +252,12 @@
 				<div class="{{ "panel panel-default" if not provider["vulnerable"] else "panel panel-warning" }}">
 				    <div class="panel-heading" role="tab" id="heading{{ provider["name"].replace(".", "") }}">
 				      <h4 class="panel-title">
-				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapse{{ provider["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ provider["name"].replace(".", "") }}">
+				        <a data-toggle="collapse" href="#collapse{{ provider["name"].replace(".", "") }}" aria-expanded="false" aria-controls="collapse{{ provider["name"].replace(".", "") }}">
 				         {{ provider["name"] }}
 				        </a>
 				      </h4>
 				    </div>
-				    <div id="collapse{{ provider["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ provider["name"].replace(".", "") }}">
+				    <div id="collapse{{ provider["name"].replace(".", "") }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ provider["name"].replace(".", "") }}">
 				      <div class="panel-body">
 				<p><strong>Read permission :</strong> {{ provider["read_permission"] }} </p>
 				<p><strong>Permissions :</strong> {{ provider["permission"] }} </p>
@@ -193,13 +285,9 @@
   			</div>
 			</div>
 			{% endfor %}
-            <br />
-            <br />
-            <pre>{{ data["modules"]["permissions/providers"]["run"]["logs"] }}</pre>
 			{% if data["modules"]["permissions/providers"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
-			</div>
 		</div>
 	</div>
 
@@ -207,25 +295,26 @@
 	<div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Services</h4></div>
-                  	<div class="panel-body">
 
 			{% if data["modules"]["permissions/services"]["run"]["results"]|length %}
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			{% else %}
+                <div class="panel-body">
 			<p> No services found. </p>
+                    </div>
 			{% endif %}
 
 			{% for service in data["modules"]["permissions/services"]["run"]["results"] %}
 
-				<div class="{{  "panel panel-default" if not service["vulnerable"] else "panel panel-warning" }}">
+				<div class="{{  "panel panel-info" if not service["vulnerable"] else "panel panel-warning" }}">
 				    <div class="panel-heading" role="tab" id="heading{{ service["name"].replace(".", "") }}">
 				      <h4 class="panel-title">
-				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapse{{ service["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ service["name"].replace(".", "") }}">
+				        <a data-toggle="collapse" href="#collapse{{ service["name"].replace(".", "") }}" aria-expanded="false" aria-controls="collapse{{ service["name"].replace(".", "") }}">
 				         {{ service["name"] }}
 				        </a>
 				      </h4>
 				    </div>
-				    <div id="collapse{{ service["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ service["name"].replace(".", "") }}">
+				    <div id="collapse{{ service["name"].replace(".", "") }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ service["name"].replace(".", "") }}">
 				      <div class="panel-body">
 				<p><strong>Process :</strong> {{ service["process"] }} </p>
 				<p><strong>Label :</strong> {{ service["label"] }} </p>
@@ -236,38 +325,35 @@
   			</div>
 			</div>
 			{% endfor %}
-            <br />
-            <br />
-            <pre>{{ data["modules"]["permissions/services"]["run"]["logs"] }}</pre>
 			{% if data["modules"]["permissions/services"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
-			</div>
 		</div>
 	</div>
 
 <div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Activities</h4></div>
-                  	<div class="panel-body">
 
 			{% if data["modules"]["permissions/activities"]["run"]["results"]|length %}
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			{% else %}
-			<p> No activities found. </p>
-			{% endif %}
+			    <div class="panel-body">
+                    <p> No activities found. </p>
+			    </div>
+            {% endif %}
 
 			{% for activity in data["modules"]["permissions/activities"]["run"]["results"] %}
 
-				<div class="{{  "panel panel-default" if not activity["vulnerable"] else "panel panel-warning" }}">
+				<div class="{{  "panel panel-info" if not activity["vulnerable"] else "panel panel-warning" }}">
 				    <div class="panel-heading" role="tab" id="heading{{ activity["name"].replace(".", "") }}">
 				      <h4 class="panel-title">
-				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapse{{ activity["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ activity["name"].replace(".", "") }}">
+				        <a data-toggle="collapse" href="#collapse{{ activity["name"].replace(".", "") }}" aria-expanded="false" aria-controls="collapse{{ activity["name"].replace(".", "") }}">
 				         {{ activity["name"] }}
 				        </a>
 				      </h4>
 				    </div>
-				    <div id="collapse{{ activity["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ activity["name"].replace(".", "") }}">
+				    <div id="collapse{{ activity["name"].replace(".", "") }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ activity["name"].replace(".", "") }}">
 				      <div class="panel-body">
 
                       <div class="col-md-5">
@@ -285,13 +371,9 @@
 
 			</div>
 			{% endfor %}
-            <br />
-            <br />
-            <pre>{{ data["modules"]["permissions/activities"]["run"]["logs"] }}</pre>
 			{% if data["modules"]["permissions/activities"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
-			</div>
 		</div>
 	</div>
 
@@ -301,25 +383,26 @@
 <div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Brodcast Receivers</h4></div>
-                  	<div class="panel-body">
 
 			{% if data["modules"]["permissions/broadcast_receivers"]["run"]["results"]|length %}
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			{% else %}
-			<p> No broadcast receivers found. </p>
+                <div class="panel-body">
+                    <p> No broadcast receivers found. </p>
+			    </div>
 			{% endif %}
 
 			{% for broadcast_receiver in data["modules"]["permissions/broadcast_receivers"]["run"]["results"] %}
 
-				<div class="{{  "panel panel-default" if not broadcast_receiver["vulnerable"] else "panel panel-warning" }}">
+				<div class="{{  "panel panel-info" if not broadcast_receiver["vulnerable"] else "panel panel-warning" }}">
 				    <div class="panel-heading" role="tab" id="heading{{ broadcast_receiver["name"].replace(".", "") }}">
 				      <h4 class="panel-title">
-				        <a data["modules"]-toggle="collapse" data["modules"]-parent="#accordion" href="#collapse{{ broadcast_receiver["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ broadcast_receiver["name"].replace(".", "") }}">
+				        <a data-toggle="collapse" href="#collapse{{ broadcast_receiver["name"].replace(".", "") }}" aria-expanded="true" aria-controls="collapse{{ broadcast_receiver["name"].replace(".", "") }}">
 				         {{ broadcast_receiver["name"] }}
 				        </a>
 				      </h4>
 				    </div>
-				    <div id="collapse{{ broadcast_receiver["name"].replace(".", "") }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading{{ broadcast_receiver["name"].replace(".", "") }}">
+				    <div id="collapse{{ broadcast_receiver["name"].replace(".", "") }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ broadcast_receiver["name"].replace(".", "") }}">
 				      <div class="panel-body">
 
                 <p><strong>Process :</strong> {{ broadcast_receiver["process"] }} </p>
@@ -334,15 +417,12 @@
 			{% if data["modules"]["permissions/activities"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
-			</div>
-		</div>
+		</div></div>
 
     <div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Logcat</h4></div>
-                  	<div class="panel-body">
-                        <textarea rows="20" style="border:none;width:100%;font-family:monospace; background-color:#f5f5f5;">{{ logcat }}</textarea>
-                    </div>
+                        <textarea rows="20" style="padding:5px;border:none;width:100%;font-family:monospace; color:white;background-color:rgb(43, 43, 43);">{{ logcat }}</textarea>
             </div>
         </div>
 
@@ -350,7 +430,6 @@
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>External storage (SDCard)</h4></div>
                   	<div class="panel-body">
-                        <pre>{{ external_storage }}</pre>
                     </div>
             </div>
         </div>
@@ -359,7 +438,7 @@
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Internal Storage</h4></div>
                   	<div class="panel-body">
-                        <pre>{{ internal_storage }}</pre>
+                        <div id="demo"></div>
                     </div>
             </div>
         </div>
@@ -367,37 +446,56 @@
 <div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Vulnerabilities</h4></div>
-                  	<div class="panel-body">
-                        <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Severity</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for module in data["modules"] %}
-        {% for vulnerability in data["modules"][module]["run"]["vulnerabilities"] %}
+       <table class="table table-bordered table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>NAME</th>
+                    <th>DESCRIPTION</th>
+					<th>SEVERITY</th>
+                </tr>
+                </thead>
+                <tbody>
+                      {% set labels = {0: "success", 1 : "info", 2: "warning", 3: "danger" } %}
+                      {% set severity = {0: "INFO", 1: "LOW", 2: "MEDIUM", 3: "HIGH"} %}
+        {% for vulnerability in vulnerabilities %}
+            {% set label = "btn btn-%s" % labels[vulnerability["level"]] %}
+
         <tr class="default">
-          <td>0</td>
+          <td>{{ loop.index }}</td>
           <td>{{ vulnerability["name"] }}</td>
           <td>{{ vulnerability["description"] }}</td>
-          <td>{{ vulnerability["level"] }}</td>
+          <td><div class="{{ label }}" style="width:100%">{{ severity[vulnerability["level"]] }}</span></td>
         </tr>
-        {% endfor %}
       {% endfor %}
       </tbody>
     </table>
-                    </div>
             </div>
         </div>
 <!-- /Main -->
 
 	<!-- script references -->
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 		<script src="../../reporting/templates/dist/js/bootstrap.min.js"></script>
 		<script src="../../reporting/templates/dist/js/scripts.js"></script>
+        <script src="../../reporting/templates/dist/js/file-tree.min.js"></script>
+        <script src="../../reporting/templates/dist/js/nestedSortable.js"></script>
+
+        <script type="text/javascript">
+$(document).ready(function(){
+var data = {{ internal_storage }};
+
+$('#demo').fileTree({
+data: data,
+sortable: true,
+selectable: true
+});
+
+});
+</script>
+
 	</body>
 </html>
