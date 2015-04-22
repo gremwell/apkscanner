@@ -120,6 +120,7 @@
 				</table>
 			</div>
         </div>
+
     <div class="col-md-10 col-md-offset-2">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>Dissassembled Code</h4></div>
@@ -206,6 +207,15 @@
 		</div>
 	</div>
 
+        <div class="col-md-10 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Network capture <a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/network/capture.pcap" alt="download network capture"><button type="button" class="btn btn-default pull-right">Download</button></a></h4></div>
+                <div class="panel-body">
+                {{ netcapture["IPs"] }}
+                </div>
+            </div>
+        </div>
         <div class="col-md-10 col-md-offset-2">
             <div class="panel panel-default">
                 	<div class="panel-heading"><h4>System Services</h4></div>
