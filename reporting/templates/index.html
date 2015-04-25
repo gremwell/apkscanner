@@ -8,10 +8,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<link href="../../reporting/templates/dist/css/bootstrap.min.css" rel="stylesheet">
 		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+			<script src="../../reporting/templates/dist/js/html5.js"></script>
 		<![endif]-->
 
-        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../../reporting/templates/dist/css/bootstrap.min.css">
 
         <link href="../../reporting/templates/dist/css/file-tree.min.css" rel="stylesheet">
         <link href="../../reporting/templates/dist/css/styles.css" rel="stylesheet">
@@ -110,7 +110,7 @@
                         <td>{{ data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["info"] }}</td>
                         <td>{{ data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["description"] }}</td>
                         <td>
-                            <div class="{{ label }}" style="width:100%;">
+                            <div class="{{ label }}" style="width:100%;background-color:#777;border:none;color:white;">
                             {{data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["status"] }}
                             </div>
                         </td>
@@ -128,8 +128,7 @@
             <div class="row">
                 <div class="col-sm-6 col-md-3">
                     <div class="thumbnail">
-                        <img src="http://placehold.it/150x150" alt="java">
-
+                        <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
                         <div class="caption">
                             <h3>Java</h3>
                             <p>Disassembled Java code</p>
@@ -139,8 +138,7 @@
                   </div>
                  <div class="col-sm-6 col-md-3">
                     <div class="thumbnail">
-                        <img src="http://placehold.it/150x150" alt="java">
-
+                        <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
                         <div class="caption">
                             <h3>Smali</h3>
                             <p>Disassembled Smali</p>
@@ -151,8 +149,7 @@
 
                  <div class="col-sm-6 col-md-3">
                     <div class="thumbnail">
-                        <img src="http://placehold.it/150x150" alt="java">
-
+                        <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
                         <div class="caption">
                             <h3>Jar</h3>
                             <p>Jar</p>
@@ -162,8 +159,7 @@
                   </div>
                 <div class="col-sm-6 col-md-3">
                     <div class="thumbnail">
-                        <img src="http://placehold.it/150x150" alt="java">
-
+                        <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
                         <div class="caption">
                             <h3>DEX</h3>
                             <p>DEX</p>
@@ -440,6 +436,7 @@
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>External storage (SDCard)</h4></div>
                   	<div class="panel-body">
+                    <div id="external_storage"></div>
                     </div>
             </div>
         </div>
@@ -448,7 +445,7 @@
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Internal Storage</h4></div>
                   	<div class="panel-body">
-                        <div id="demo"></div>
+                        <div id="internal_storage"></div>
                     </div>
             </div>
         </div>
@@ -485,10 +482,9 @@
 <!-- /Main -->
 
 	<!-- script references -->
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+		<script src="../../reporting/templates/dist/js/jquery.min.js"></script>
+        <script src="../../reporting/templates/dist/js/jquery-ui.min.js"></script>
+        <script src="../../reporting/templates/dist/js/bootstrap.min.js"></script>
 		<script src="../../reporting/templates/dist/js/bootstrap.min.js"></script>
 		<script src="../../reporting/templates/dist/js/scripts.js"></script>
         <script src="../../reporting/templates/dist/js/file-tree.min.js"></script>
@@ -496,14 +492,10 @@
 
         <script type="text/javascript">
 $(document).ready(function(){
-var data = {{ internal_storage }};
-
-$('#demo').fileTree({
-data: data,
-sortable: true,
-selectable: true
-});
-
+    var internal_data = {{ internal_storage }};
+    $('#internal_storage').fileTree({ data: internal_data, sortable: true, selectable: true });
+    var external_data = {{ external_storage }};
+    $('#external_storage').fileTree({ data: external_data, sortable: true, selectable: true });
 });
 </script>
      <footer class='row'>
