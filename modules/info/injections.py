@@ -46,15 +46,13 @@ class Module(framework.module):
                             if method.get_debug().get_line_start() not in r["lines"]:
                                 r["lines"].append(method.get_debug().get_line_start())
 
-        vulnerabilities = [framework.Vulnerability(
+        return {
+            "results": results,
+            "logs": logs,
+            "vulnerabilities": [framework.Vulnerability(
             "Multiple SQL injection vectors.",
             "The application do not make use of prepared statement which could lead to SQL injection vulnerabilities."
             "Review the results to see if these raw queries can be exploited.",
             framework.Vulnerability.LOW
         ).__dict__] if len(results) else []
-
-        return {
-            "results": results,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
         }
