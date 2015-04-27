@@ -22,7 +22,7 @@ class Module(framework.module):
     def module_run(self, verbose=False):
 
         logs = ""
-        vulnerabilities = []
+        vulnerable = False
         providers = self.get_providers()
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -59,12 +59,7 @@ class Module(framework.module):
                         logs += "$ adb shell content query --uri %s\n" % uri
                         logs += self.avd.shell("content query --uri %s" % uri)
                 provider["vulnerable"] = True
-                vulnerabilities.append(framework.Vulnerability(
-                    "Exported content provider.",
-                    "The following application provider is exported, which means that any application can access it"
-                    " without the need for any custom permission.",
-                    framework.Vulnerability.MEDIUM
-                ).__dict__)
+                vulnerable = True
             else:
                 provider["vulnerable"] = False
 
@@ -73,5 +68,10 @@ class Module(framework.module):
         return {
             "results": providers,
             "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": [framework.Vulnerability(
+                    "Exported content provider.",
+                    "The following application provider is exported, which means that any application can access it"
+                    " without the need for any custom permission.",
+                    framework.Vulnerability.MEDIUM
+                ).__dict__] if vulnerable else []
         }
