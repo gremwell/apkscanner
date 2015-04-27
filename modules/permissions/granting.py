@@ -34,18 +34,19 @@ class Module(framework.module):
             "manifest_permissions": {},
             "app_permissions": ["android.permission.%s" % (str(p)) for p in dx.get_permissions([])]
         }
-        for p in [p.replace("android.permission.", "") for p in self.get_permissions()]:
+        for p in self.get_permissions():
             results["manifest_permissions"][p] = {}
-            results["manifest_permissions"][p]["status"]= DVM_PERMISSIONS["MANIFEST_PERMISSION"][p][0] \
-                if p in DVM_PERMISSIONS["MANIFEST_PERMISSION"] else "unknown"
-            results["manifest_permissions"][p]["info"] = DVM_PERMISSIONS["MANIFEST_PERMISSION"][p][1] \
-                if p in DVM_PERMISSIONS["MANIFEST_PERMISSION"] else "unknown"
-            results["manifest_permissions"][p]["description"] = DVM_PERMISSIONS["MANIFEST_PERMISSION"][p][2] \
-                if p in DVM_PERMISSIONS["MANIFEST_PERMISSION"] else "unknown"
+            _p = p.replace("android.permission.", "")
+            results["manifest_permissions"][p]["status"]= DVM_PERMISSIONS["MANIFEST_PERMISSION"][_p][0] \
+                if _p in DVM_PERMISSIONS["MANIFEST_PERMISSION"] else "unknown"
+            results["manifest_permissions"][p]["info"] = DVM_PERMISSIONS["MANIFEST_PERMISSION"][_p][1] \
+                if _p in DVM_PERMISSIONS["MANIFEST_PERMISSION"] else "unknown"
+            results["manifest_permissions"][p]["description"] = DVM_PERMISSIONS["MANIFEST_PERMISSION"][_p][2] \
+                if _p in DVM_PERMISSIONS["MANIFEST_PERMISSION"] else "unknown"
 
         perms = dx.get_permissions([])
         for perm in perms:
-            t=False
+            t = False
             for path in perms[perm]:
                 if isinstance(path, PathP):
                     method = d.get_method_by_idx(path.get_src_idx())
