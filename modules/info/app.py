@@ -30,6 +30,9 @@ class Module(framework.module):
                 'version': self.apk.androidversion['Code'],
                 'name': self.apk.androidversion['Name']
             },
+            'min_sdk': self.apk.get_min_sdk_version(),
+            'target_sdk': self.apk.get_target_sdk_version(),
+            'libraries': [],
             'hashes': {
                 'md5': None,
                 'sha1': None,
@@ -37,6 +40,11 @@ class Module(framework.module):
             },
             'size': 0
         }
+
+        try:
+            info["libraries"] = self.apk.get_libraries()
+        except AttributeError:
+            info["libraries"] = []
 
         md5 = hashlib.md5()
         sha1 = hashlib.sha1()
