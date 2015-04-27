@@ -193,7 +193,7 @@ class APKScanner(framework.module):
             os.path.dirname(os.path.realpath(__file__)),
             self.apk.get_package()
         )
-        summary += "\n\t* Device storage dump: %s/analysis/%s/storagee" % (
+        summary += "\n\t* Device storage dump: %s/analysis/%s/storage" % (
             os.path.dirname(os.path.realpath(__file__)),
             self.apk.get_package()
         )
@@ -236,29 +236,47 @@ class APKScanner(framework.module):
             with open("./analysis/%s.json" % self.apk.get_package(), "wb") as f:
                 f.write(json.dumps(self.analysis))
         elif fmt == "html":
-            logcat = ""
-            with open("./analysis/%s/logs/logcat_full.log" % (self.apk.get_package())) as f:
-                logcat = f.read()
-}
-            def list_files(startpath):
-                s = ""
-                for root, dirs, files in os.walk(startpath):
-                    level = root.replace(startpath, '').count(os.sep)
-                    indent = '\t' * (level)
-                    s += "\n%s<a href='file://%s/%s'>%s</a>/" % (indent, os.path.dirname(os.path.realpath(__file__)), root, os.path.basename(root))
-                    subindent = '\t' * (level + 1)
-                    for l in files:
-                        s += "\n%s<a href='file://%s/%s/%s' >%s</a>" % (subindent, os.path.dirname(os.path.realpath(__file__)), root, l, l)
-                return s
+            def path_to_dict(path):
+                d = {'name': os.path.basename(path)}
+                if os.path.isdir(path):
+                    d['type'] = "directory"
+                    d['id'] = path
+                    d['name'] = os.path.basename(path)
+                    d['type'] = "dir"
+                    d['children'] = [path_to_dict(os.path.join(path, x)) for x in os.listdir(path)]
+                else:
+                    d['id'] = path
+                    d['name'] = os.path.basename(path)
+                    d['url'] = "file://%s" % path
+                    d['type'] = "file"
+                return d
 
-            #internal_storage = list_files("./analysis/%s/storage/data/data" % self.apk.get_package())
-            internal_storage = ""
-            external_storage = list_files("./analysis/%s/storage/sdcard" % self.apk.get_package())
+            logcat = ""
+            with open("./analysis/%s/logs/logcat_full.log" % self.apk.get_package()) as f:
+                logcat = f.read()
+
+            netcapture = {
+                #"IPs":set((p[IP].src, p[IP].dst) for p in PcapReader('../analysis/%s/network/capture.pcap' % sys.argv[1]) if IP in p)
+                "IPs": set()
+            }
+
+            loader = FileSystemLoader("./reporting/templates")
+            env = Environment(loader=loader)
+            internal_storage = json.dumps([path_to_dict("./analysis/%s/storage/data/data" % sys.argv[1])])
+            external_storage = json.dumps([path_to_dict("./analysis/%s/storage/sdcard" % self.apk.get_package())])
             template = env.get_template("index.html")
-            html_out = template.render(data=self.analysis, logcat=logcat,
+            analysis = json.load(open("./analysis/%s.json" % self.apk.get_package()))
+            _v = []
+            for v in [analysis["modules"][module]["run"]["vulnerabilities"]
+                      for module in analysis["modules"] if len(analysis["modules"][module]["run"]["vulnerabilities"])]:
+                _v += v
+            html_out = template.render(data=analysis, logcat=logcat,
                                        internal_storage=internal_storage,
-                                       external_storage=external_storage)
-            with codecs.open("./analysis/%s/report.html" % (self.apk.get_package()), "w", "utf-8") as f:
+                                       external_storage=external_storage,
+                                       vulnerabilities=_v,
+                                       netcapture=netcapture)
+
+            with codecs.open("./analysis/%s/report.html" % self.apk.get_package(), "w", "utf-8") as f:
                 f.write(html_out)
             return
         else:
