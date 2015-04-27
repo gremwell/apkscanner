@@ -18,9 +18,8 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        vulnerabilities = []
         webviews = []
-
+        vulnerable = False
         funcs = [
             {
                 "name": "setJavaScriptEnabled",
@@ -89,14 +88,15 @@ class Module(framework.module):
 
         for webview in webviews:
             if webview["setJavaScriptEnabled"]:
-                vulnerabilities.append(framework.Vulnerability(
-                    "Explicitly enabled Javascript in WebViews",
-                    "The application explicitly enable Javascript for multiple webviews.",
-                    framework.Vulnerability.LOW
-                ).__dict__)
+                vulnerable = True
 
         return {
             "results": webviews,
             "logs": "",
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": [
+                framework.Vulnerability(
+                    "Explicitly enabled Javascript in WebViews",
+                    "The application explicitly enable Javascript for multiple webviews.",
+                    framework.Vulnerability.MEDIUM
+                ).__dict__] if vulnerable else []
         }
