@@ -89,9 +89,7 @@ class APKScanner(framework.module):
         self.avd.install(self.apk.filename)
         self.avd.remount()
         self.avd.push("./libs/busybox-android/busybox-android", "/system/xbin/busybox")
-        self.avd.push("./libs/busybox-android/android-remote-install.sh", "/system/bin/android-remote-install.sh")
         self.avd.shell("chmod 777 /system/bin/android-remote-install.sh")
-        self.avd.shell("/system/bin/android-remote-install.sh")
         self.avd.unlock()
 
         self.output("Launching application ...")
@@ -241,7 +239,7 @@ class APKScanner(framework.module):
             logcat = ""
             with open("./analysis/%s/logs/logcat_full.log" % (self.apk.get_package())) as f:
                 logcat = f.read()
-
+}
             def list_files(startpath):
                 s = ""
                 for root, dirs, files in os.walk(startpath):
@@ -373,7 +371,7 @@ class APKScanner(framework.module):
         if uid is not None:
             self.output("Found application UID : %d" % uid)
             self.output("Searching for files owned by user %d" % uid)
-            files = avd.shell("find /sdcard -type f -user %d" % uid)
+            files = avd.shell("/system/xbin/busybox find /sdcard -type f -user %d" % uid)
             for f in [x for x in files.split("\n") if len(x)]:
                 print avd.pull(f, "./analysis/%s/storage/sdcard" % self.apk.get_package())
         return
