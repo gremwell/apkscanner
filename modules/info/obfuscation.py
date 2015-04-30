@@ -102,7 +102,10 @@ class Module(framework.module):
             "logs": "",
             "vulnerabilities": [framework.Vulnerability(
                 "Lack of Code Obfuscation",
-                "",
+                "Obfuscation raise the bar for third parties that would want to determine how your application is "
+                "working and protect your application against piracy or unwanted clones on the market."
+                "Multiple solutions exists but we recommend you to use Proguard as it is well integrated into the "
+                "Android Studio IDE.",
                 framework.Vulnerability.LOW
             ).__dict__] if obfuscator is None else []
         }

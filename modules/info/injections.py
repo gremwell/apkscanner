@@ -19,7 +19,6 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        logs = ""
         results = []
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -48,11 +47,11 @@ class Module(framework.module):
 
         return {
             "results": results,
-            "logs": logs,
             "vulnerabilities": [framework.Vulnerability(
             "Multiple SQL injection vectors.",
             "The application do not make use of prepared statement which could lead to SQL injection vulnerabilities."
             "Review the results to see if these raw queries can be exploited.",
-            framework.Vulnerability.LOW
+            framework.Vulnerability.LOW,
+            resources=results
         ).__dict__] if len(results) else []
         }

@@ -94,6 +94,5 @@ class Module(framework.module):
                     external_services.add(android_system_services[matches[0]])
         return {
             "results": sorted(external_services),
-            "logs": "",
-            "vulnerabilities": "",
+            "vulnerabilities": []
         }

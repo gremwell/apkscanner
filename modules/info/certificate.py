@@ -22,7 +22,6 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        logs = ""
         result = None
 
         file_list = self.apk.zip.namelist()
@@ -37,8 +36,6 @@ class Module(framework.module):
             with open("/tmp/%s.cert" % self.apk.get_package(), "wb") as f:
                 rsa = self.apk.get_file(cert_found)
                 f.write(rsa)
-            logs += "openssl pkcs7 -inform DER -in /tmp/%s.cert -out /tmp/%s.pem -outform PEM -print_certs" % \
-                    (self.apk.get_package(), self.apk.get_package())
 
             proc = subprocess.Popen(
                 ["openssl", "pkcs7", "-inform", "DER", "-in", "/tmp/%s.cert" % self.apk.get_package(),
@@ -96,7 +93,8 @@ class Module(framework.module):
                 framework.Vulnerability(
                     "Debug certificate.",
                     "The application has been packaged with a debug certificate.",
-                    framework.Vulnerability.LOW
+                    framework.Vulnerability.LOW,
+                    logs=result["issuer"]
                 ).__dict__
             )
 
@@ -111,6 +109,5 @@ class Module(framework.module):
 
         return {
             "results": result,
-            "logs": logs,
             "vulnerabilities": vulnerabilities
         }

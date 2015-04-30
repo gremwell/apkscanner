@@ -94,6 +94,5 @@ class Module(framework.module):
 
         return {
             "results": info,
-            "logs": "",
             "vulnerabilities": []
         }

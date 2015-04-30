@@ -44,9 +44,12 @@ class Module(framework.module):
 
         return {
             "results": activities,
-            "logs": logs,
-            "vulnerabilities": [framework.Vulnerability("Potentially vulnerable activity components.",
-                                                        "The following activities were found to be vulnerable.",
-                                                        framework.Vulnerability.LOW
+            "vulnerabilities": [
+                framework.Vulnerability(
+                    "Potentially vulnerable activity components.",
+                    "The following activities were found to be vulnerable.",
+                    framework.Vulnerability.LOW,
+                    resources=[a for a in activities if a["vulnerable"]],
+                    logs=logs
             ).__dict__] if vulnerable else []
         }

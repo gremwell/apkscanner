@@ -97,6 +97,7 @@ class Module(framework.module):
                 framework.Vulnerability(
                     "Explicitly enabled Javascript in WebViews",
                     "The application explicitly enable Javascript for multiple webviews.",
-                    framework.Vulnerability.MEDIUM
+                    framework.Vulnerability.MEDIUM,
+                    resources=webviews
                 ).__dict__] if vulnerable else []
         }

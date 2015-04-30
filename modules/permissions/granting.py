@@ -23,8 +23,6 @@ class Module(framework.module):
     def module_run(self, verbose=False):
 
         #TODO: the real issue is that "is the code linked to a permission really reached during runtime ?"
-        logs = ""
-        vulnerabilities = []
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
         dx = VMAnalysis(d)
@@ -68,6 +66,5 @@ class Module(framework.module):
 
         return {
             "results": results,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": []
         }

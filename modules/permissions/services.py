@@ -33,11 +33,12 @@ class Module(framework.module):
             print logs
 
         return {
-            "logs": logs,
             "results": services,
             "vulnerabilities": [framework.Vulnerability(
                 "Potentially vulnerable service component.",
                 "The following services were found to be vulnerable.",
-                framework.Vulnerability.LOW
+                framework.Vulnerability.LOW,
+                resources=[s for s in services if s["vulnerable"]],
+                logs=logs
             ).__dict__] if vulnerable else []
         }

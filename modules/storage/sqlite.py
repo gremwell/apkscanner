@@ -19,8 +19,6 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        logs = ""
-        vulnerabilities = []
         results = {}
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -55,6 +53,5 @@ class Module(framework.module):
 
         return {
             "results": results,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": []
         }

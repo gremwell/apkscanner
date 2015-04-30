@@ -23,8 +23,6 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        logs = ""
-        vulnerabilities = []
         libs = []
             
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -77,11 +75,8 @@ class Module(framework.module):
                                             stdout=f,
                                             stderr=subprocess.PIPE
                                         )
-                                        if exitcode:
-                                            raise Exception("An error occured when running objdump on %s" % path)
-                                        else:
-                                            logs += "$ %s %s > %s\n" % \
-                                                    (objdump_bin, os.path.abspath(path), objdump_outfile)
+                                        #if exitcode:
+                                        #    raise Exception("An error occured when running objdump on %s" % path)
 
                                 p = subprocess.Popen(
                                     "file %s" % os.path.abspath(path),
@@ -90,7 +85,6 @@ class Module(framework.module):
                                     stderr=subprocess.PIPE
                                 )
                                 stdout, stderr = p.communicate()
-                                logs += "$ file %s\n%s\n" % (os.path.abspath(path), stdout if not stderr else stderr)
                                 libs.append(
                                     {
                                         "name": m,
@@ -117,10 +111,8 @@ class Module(framework.module):
         if verbose:
             for lib in libs:
                 print "%s [%s] - %s" % (lib["name"], lib["arch"], lib["path"])
-            print "\n%s" % logs
 
         return {
             "results": libs,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": []
         }

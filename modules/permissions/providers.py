@@ -67,11 +67,13 @@ class Module(framework.module):
             print logs
         return {
             "results": providers,
-            "logs": logs,
-            "vulnerabilities": [framework.Vulnerability(
+            "vulnerabilities": [
+                framework.Vulnerability(
                     "Exported content provider.",
                     "The following application provider is exported, which means that any application can access it"
                     " without the need for any custom permission.",
-                    framework.Vulnerability.MEDIUM
+                    framework.Vulnerability.MEDIUM,
+                    resources=[p for p in providers if p["vulnerable"]],
+                    logs=logs
                 ).__dict__] if vulnerable else []
         }

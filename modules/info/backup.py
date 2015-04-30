@@ -16,7 +16,6 @@ class Module(framework.module):
         }
 
     def module_run(self, verbose=False):
-        logs = ""
         xml = self.apk.get_android_manifest_xml()
         results = {
             "allow_backup": False,
@@ -59,17 +58,17 @@ class Module(framework.module):
 
         return {
             "results": results,
-            "logs": logs,
-            "vulnerabilities": [framework.Vulnerability(
-                "The application allow backups.",
-                "The allowBackup attribute determines if an application's data can be backed up and restored.\n"
-                "By default, this flag is set to true. When this flag is set to true, application data can be backed up"
-                " and restored by the user using adb backup and adb restore. This may have security consequences for an"
-                " application. adb backup allows users who have enabled USB debugging to copy application data off of"
-                " the device. Once backed up, all application data can be read by the user. adb restore allows creation"
-                " of application data from a source specified by the user. Following a restore, applications should not"
-                " assume that the data, file permissions, and directory permissions were created by the application"
-                " itself. Setting allowBackup=\"false\" opts an application out of both backup and restore.",
-                framework.Vulnerability.LOW
-            ).__dict__] if results["allow_backup"] is True else []
+            "vulnerabilities": [
+                framework.Vulnerability(
+                    "The application allow backups.",
+                    "The allowBackup attribute determines if an application's data can be backed up and restored.\n"
+                    "By default, this flag is set to true. When this flag is set to true, application data can be backed up"
+                    " and restored by the user using adb backup and adb restore. This may have security consequences for an"
+                    " application. adb backup allows users who have enabled USB debugging to copy application data off of"
+                    " the device. Once backed up, all application data can be read by the user. adb restore allows creation"
+                    " of application data from a source specified by the user. Following a restore, applications should not"
+                    " assume that the data, file permissions, and directory permissions were created by the application"
+                    " itself. Setting allowBackup=\"false\" opts an application out of both backup and restore.",
+                    framework.Vulnerability.LOW
+                ).__dict__] if results["allow_backup"] is True else []
         }

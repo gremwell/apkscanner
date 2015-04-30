@@ -76,11 +76,11 @@ class Module(framework.module):
 
         return {
             "results": debuggable,
-            "logs": logs,
             "vulnerabilities": [framework.Vulnerability(
                 "The application is debuggable",
                 "The application is set to debuggable. This setting allow anyone to connect a debugger like jdb to the "
                 "running process.",
-                framework.Vulnerability.MEDIUM
+                framework.Vulnerability.HIGH,
+                logs=logs
             ).__dict__] if debuggable else []
         }
