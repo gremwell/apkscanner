@@ -18,39 +18,41 @@
     </head>
 	<body>
 <!-- Header -->
-<div id="top-nav" class="navbar navbar-inverse navbar-static-top">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data["modules"]-toggle="collapse" data["modules"]-target=".navbar-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">APKScanner Report ({{ data["modules"]["info/app"]["run"]["results"]["package_name"] }})</a>
-    </div>
-  </div><!-- /container -->
-</div>
+
 <!-- /Header -->
 
 <!-- Main -->
 <div class="container-fluid">
-<div class="row">
-    <div class="col-md-10">
+    <div class="row">
+        <div class="col-md-7 col-md-offset-1">
+        <div class="header clearfix">
+        <h3 class="text-muted">{{ data["modules"]["info/app"]["run"]["results"]["package_name"] }}</h3>
+            <hr>
+      </div>
+            </div>
+    </div>
 
-      	<div class="row">
 
-	 <div class="col-md-5 col-md-offset-2">
+	 <div class="col-md-5 col-md-offset-1">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Informations</h4></div>
                   	<div class="panel-body">
                 	<p><strong>Name :</strong> {{ data["modules"]["info/app"]["run"]["results"]["name"] }} </p>
 			<p><strong>Package :</strong> {{ data["modules"]["info/app"]["run"]["results"]["package_name"] }} </p>
-			<p><strong>Description :</strong> {{ data["modules"]["info/app"]["run"]["results"]["description"].replace("&lt;", "<").replace("&gt;",">") }}
+			<p><strong>Description :</strong> {{ data["modules"]["info/app"]["run"]["results"]["description"] }}
 			<p><strong>Platform: </strong> {{ data["modules"]["info/app"]["run"]["results"]["platform"]["version"] }} - {{ data["modules"]["info/app"]["run"]["results"]["platform"]["name"] }}  </p>
-			<!-- <img src="{{ data["modules"]["info/app"]["run"]["results"]["icon"]}}" alt="app icon" /> -->
-			<p><strong>Debuggable: </strong> {{  "<span class=\"label label-danger\">True</span>" if data["modules"]["info/debuggable"] else "<span class=\"label label-success\">False</span>" }} </p>
+            <p><strong>Min SDK: </strong> {{ data["modules"]["info/app"]["run"]["results"]["min_sdk"] }}  </p>
+			<p><strong>Target SDK: </strong> {{ data["modules"]["info/app"]["run"]["results"]["target_sdk"] }}  </p>
+            <p><strong>Debuggable: </strong> {{  "<span class=\"label label-danger\">True</span>" if data["modules"]["info/debuggable"]["run"]["results"] else "<span class=\"label label-success\">False</span>" }} </p>
 			<p><strong>Allow Backups: </strong> {{ data["modules"]["info/backup"]["run"]["results"]["allow_backup"] }} </p>
             <p><strong>Obfuscation: </strong> {{ data["modules"]["info/obfuscation"]["run"]["results"] }} </p>
+            <p><strong>Libraries: </strong>
+            <ul>
+                        {% for library in data["modules"]["info/app"]["run"]["results"]["libraries"] %}
+                            <li>{{ library }}</li>
+                        {% endfor %}
+            </ul>
+            </p>
         </div>
 	</div>
 </div>
@@ -87,18 +89,16 @@
 	</div>
 	</div>
 
-	</div>
-    <div class="col-md-10 col-md-offset-2">
+    <div class="col-md-10 col-md-offset-1">
 
         <div class="panel panel-default">
 			<div class="panel-heading"><h4>Permissions</h4></div>
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>PERMISSION</th>
-                    <th>INFO </th>
+                    <th>NAME</th>
 					<th>DESCRIPTION</th>
-                    <th>STATUS</th>
+                    <th>LEVEL</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -107,7 +107,6 @@
 				    {% set label = "btn btn-%s" % labels[data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["status"]] %}
                     <tr>
                         <td>{{ name }}</td>
-                        <td>{{ data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["info"] }}</td>
                         <td>{{ data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["description"] }}</td>
                         <td>
                             <div class="{{ label }}" style="width:100%;background-color:#777;border:none;color:white;">
@@ -121,49 +120,53 @@
 			</div>
         </div>
 
-    <div class="col-md-10 col-md-offset-2">
+    <div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>Dissassembled Code</h4></div>
             <div class="panel-body">
             <div class="row">
                 <div class="col-sm-6 col-md-3">
                     <div class="thumbnail">
-                        <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
+                        <a href="#">
+                            <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
+                        </a>
                         <div class="caption">
                             <h3>Java</h3>
                             <p>Disassembled Java code</p>
-                            <p><a href="#" class="btn btn-primary" role="button">View</a> <a href="#" class="btn btn-default" role="button">Download</a></p>
                         </div>
                     </div>
                   </div>
                  <div class="col-sm-6 col-md-3">
                     <div class="thumbnail">
-                        <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
+                        <a href="#">
+                            <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
+                        </a>
                         <div class="caption">
                             <h3>Smali</h3>
                             <p>Disassembled Smali</p>
-                            <p><a href="#" class="btn btn-primary" role="button">View</a> <a href="#" class="btn btn-default" role="button">Download</a></p>
                         </div>
                     </div>
                   </div>
 
                  <div class="col-sm-6 col-md-3">
                     <div class="thumbnail">
-                        <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
+                        <a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/code/jar/classes.jar">
+                            <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
+                        </a>
                         <div class="caption">
                             <h3>Jar</h3>
                             <p>Jar</p>
-                            <p><a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/code/jar/classes.jar" class="btn btn-default" role="button">Download</a></p>
                         </div>
                     </div>
                   </div>
                 <div class="col-sm-6 col-md-3">
                     <div class="thumbnail">
-                        <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
+                        <a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/code/orig/classes.dex">
+                            <i class="glyphicon glyphicon-download" style="color:#555;margin-left:25%;margin-top:10px;font-size:100px;"></i>
+                        </a>
                         <div class="caption">
                             <h3>DEX</h3>
                             <p>DEX</p>
-                            <p><a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/code/orig/classes.dex" class="btn btn-default" role="button">Download</a></p>
                         </div>
                     </div>
                   </div>
@@ -172,23 +175,25 @@
 		</div>
 	</div>
 
-	<div class="col-md-10 col-md-offset-2">
+	<div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
 			<div class="panel-heading"><h4>Native Code</h4></div>
-
             {% if data["modules"]["info/native"]["run"]["results"]|length %}
-                 <table class="table table-bordered table-hover table-striped">
+                 <table class="table-responsive table-bordered table-hover">
                 <thead>
                 <tr>
                     <th>NAME</th>
-                    <th>PATH</th>
                     <th>ARCH </th>
 					<th>DESCRIPTION</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for lib in data["modules"]["info/native"]["run"]["results"] %}
-                    <tr><td>{{ lib["name"] }}</td><td>{{ lib["path"] }}</td><td>{{ lib["arch"] }}</td><td>{{ lib["info"] }}</td></tr>
+                    <tr>
+                        <td><p>{{ lib["name"] }}</p></td>
+                        <td><p>{{ lib["arch"] }}</p></td>
+                        <td><p>{{ lib["info"] }}</p></td>
+                    </tr>
                 {% endfor %}
                 </tbody>
                 </table>
@@ -203,7 +208,7 @@
 		</div>
 	</div>
 
-        <div class="col-md-10 col-md-offset-2">
+        <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h4>Network capture <a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/network/capture.pcap" alt="download network capture"><button type="button" class="btn btn-default pull-right">Download</button></a></h4></div>
@@ -212,7 +217,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-10 col-md-offset-2">
+        <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 	<div class="panel-heading"><h4>System Services</h4></div>
 
@@ -241,7 +246,7 @@
 
 
 
-	<div class="col-md-10 col-md-offset-2">
+	<div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Providers</h4></div>
 
@@ -294,11 +299,11 @@
 			{% if data["modules"]["permissions/providers"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
-		</div>
 	</div>
+</div>
 
 
-	<div class="col-md-10 col-md-offset-2">
+	<div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Services</h4></div>
 
@@ -329,7 +334,7 @@
 				<p><strong>Exported :</strong> {{ service["exported"] }} </p>
 					  </div>
   			</div>
-			</div>
+        </div>
 			{% endfor %}
 			{% if data["modules"]["permissions/services"]["run"]["results"]|length %}
 				</div>
@@ -337,7 +342,8 @@
 		</div>
 	</div>
 
-<div class="col-md-10 col-md-offset-2">
+
+<div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Activities</h4></div>
 
@@ -386,7 +392,7 @@
 
 
 
-<div class="col-md-10 col-md-offset-2">
+<div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Brodcast Receivers</h4></div>
 
@@ -420,28 +426,59 @@
   			</div>
 			</div>
 			{% endfor %}
-			{% if data["modules"]["permissions/activities"]["run"]["results"]|length %}
+			{% if data["modules"]["permissions/broadcast_receivers"]["run"]["results"]|length %}
 				</div>
 			{% endif %}
 		</div></div>
 
-    <div class="col-md-10 col-md-offset-2">
+    <div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
-                	<div class="panel-heading"><h4>Logcat</h4></div>
-                        <textarea rows="20" style="padding:5px;border:none;width:100%;font-family:monospace; color:white;background-color:rgb(43, 43, 43);">{{ logcat }}</textarea>
+                	<div class="panel-heading"><h4>Logcat <input type="text" id="logcat_search" style="width:200px;" placeholder="Search" class="form-control pull-right" /></h4></div>
+                    <textarea id="logcat_display" rows="20" style="padding:5px;border:none;width:100%;font-family:monospace; color:white;background-color:rgb(43, 43, 43);">{{ logcat }}</textarea>
+                    <div id="logcat" style="visibility:hidden;overflow-y:hidden;overflow-x:hidden;height:0px;">{{ logcat }} </div>
             </div>
         </div>
 
-    <div class="col-md-10 col-md-offset-2">
+    <div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
-                	<div class="panel-heading"><h4>External storage (SDCard)</h4></div>
+                	<div class="panel-heading"><h4>Strings</h4></div>
+                        <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>URLS</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for url in data["modules"]["info/strings"]["run"]["results"]["urls"] %}
+                <tr><td>{{ url }}</td></tr>
+                {% endfor %}
+                </tbody>
+                </table>
+            <br /><br />
+                <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>EMAILS</th>
+                </tr>
+                </thead>
+                <tbody>
+                            {% for email in data["modules"]["info/strings"]["run"]["results"]["emails"] %}
+                <tr class="default"><td>{{ email }}</td></tr>
+                            {% endfor %}
+                        </tbody></table>
+            </div>
+        </div>
+
+    <div class="col-md-10 col-md-offset-1">
+		<div class="panel panel-default">
+                	<div class="panel-heading"><h4>External storage</h4></div>
                   	<div class="panel-body">
                     <div id="external_storage"></div>
                     </div>
             </div>
         </div>
 
-    <div class="col-md-10 col-md-offset-2">
+    <div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Internal Storage</h4></div>
                   	<div class="panel-body">
@@ -450,14 +487,14 @@
             </div>
         </div>
 
-<div class="col-md-10 col-md-offset-2">
+<div class="col-md-10 col-md-offset-1">
 		<div class="panel panel-default">
                 	<div class="panel-heading"><h4>Vulnerabilities</h4></div>
-       <table class="table table-bordered table-hover table-striped">
+       <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>NAME</th>
+                    <th class="col-md-3">NAME</th>
                     <th>DESCRIPTION</th>
 					<th>SEVERITY</th>
                 </tr>
@@ -465,19 +502,28 @@
                 <tbody>
                       {% set labels = {0: "success", 1 : "info", 2: "warning", 3: "danger" } %}
                       {% set severity = {0: "INFO", 1: "LOW", 2: "MEDIUM", 3: "HIGH"} %}
-        {% for vulnerability in vulnerabilities %}
+        {% for vulnerability in vulnerabilities|sort(reverse=True, attribute='level') %}
             {% set label = "btn btn-%s" % labels[vulnerability["level"]] %}
 
         <tr class="default">
           <td>{{ loop.index }}</td>
           <td>{{ vulnerability["name"] }}</td>
-          <td>{{ vulnerability["description"] }}</td>
+          <td>{{ vulnerability["description"] }}
+              <br /><br />
+              <ul>
+              {% for resource in vulnerability["resources"] %}
+                <li>{{ resource["name"] }} {{ resource["file"]  }}</li>
+              {% endfor %}
+              </ul>
+              {% if vulnerability["logs"] != None %}
+                <pre>{{ vulnerability["logs"] }} </pre>
+              {% endif %}
+          </td>
           <td><div class="{{ label }}" style="width:100%">{{ severity[vulnerability["level"]] }}</span></td>
         </tr>
       {% endfor %}
       </tbody>
     </table>
-            </div>
         </div>
 <!-- /Main -->
 
@@ -496,12 +542,22 @@ $(document).ready(function(){
     $('#internal_storage').fileTree({ data: internal_data, sortable: true, selectable: true });
     var external_data = {{ external_storage }};
     $('#external_storage').fileTree({ data: external_data, sortable: true, selectable: true });
+    $('#logcat_search').on('keyup', function(evt) {
+        var search = $('#logcat_search').val();
+        if(search == "") {
+            $('#logcat_display').html($('#logcat').html());
+        }else{
+            $('#logcat_display').html("");
+            var logcat = $('#logcat').html().split('\n');
+            logcat.forEach(function(line) {
+                if(line.indexOf(search) > -1){
+                    $('#logcat_display').append(line+"\n");
+                }
+            });
+        }
+
+    });
 });
 </script>
-     <footer class='row'>
-         <div style='text-align: center;'>
-             <h4>APKScanner - Gremwell bvba 2015</h4>
-         </div>
-     </footer>
     </body>
 </html>
