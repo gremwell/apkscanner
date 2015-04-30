@@ -30,11 +30,12 @@ class Vulnerability(object):
     MEDIUM = 2
     HIGH = 3
 
-    def __init__(self, name=None, description=None, level=None, resources=None):
+    def __init__(self, name=None, description=None, level=None, resources=None, logs=None):
         self.level = self.INFO if level is None else level
         self.name = name
         self.description = description
         self.resources = [] if resources is None else resources
+        self.logs = logs
 
 
 class module(object):
