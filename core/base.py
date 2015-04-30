@@ -230,8 +230,6 @@ class APKScanner(framework.module):
         Returns:
         Throws:
         """
-        loader = FileSystemLoader("reporting/templates")
-        env = Environment(loader=loader)
         if fmt == "json":
             with open("./analysis/%s.json" % self.apk.get_package(), "wb") as f:
                 f.write(json.dumps(self.analysis))
@@ -262,7 +260,7 @@ class APKScanner(framework.module):
 
             loader = FileSystemLoader("./reporting/templates")
             env = Environment(loader=loader)
-            internal_storage = json.dumps([path_to_dict("./analysis/%s/storage/data/data" % sys.argv[1])])
+            internal_storage = json.dumps([path_to_dict("./analysis/%s/storage/data/data" % self.apk.get_package())])
             external_storage = json.dumps([path_to_dict("./analysis/%s/storage/sdcard" % self.apk.get_package())])
             template = env.get_template("index.html")
             analysis = json.load(open("./analysis/%s.json" % self.apk.get_package()))
