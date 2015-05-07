@@ -108,7 +108,8 @@
                 <thead><td>Name</td><td>Path</td><td>Arch</td><td>Info</td></thead>
                 <tbody>
                 {% for lib in data["modules"]["info/native"]["run"]["results"] %}
-                    <tr><td>{{ lib["name"] }}</td><td>{{ lib["path"] }}</td><td>{{ lib["arch"] }}</td><td>{{ lib["info"] }}</td></tr>
+                    <tr><td>{{ lib["name"] }}</td><td>{{ lib["path"] }}</td><td>{{ lib["arch"] }}</td>
+                        <td>{{ lib["info"] }}<br /><br />{{ lib["checksec"]|replace("\n\n", "<br />")|replace(" ", "&nbsp&nbsp") }}</td></tr>
                 {% endfor %}
                 </tbody>
                 </table>
