@@ -23,6 +23,8 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
+        logs = ""
+        vulnerabilities = []
         libs = []
             
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -75,8 +77,11 @@ class Module(framework.module):
                                             stdout=f,
                                             stderr=subprocess.PIPE
                                         )
-                                        #if exitcode:
-                                        #    raise Exception("An error occured when running objdump on %s" % path)
+                                        if exitcode:
+                                            raise Exception("An error occured when running objdump on %s" % path)
+                                        else:
+                                            logs += "$ %s %s > %s\n" % \
+                                                    (objdump_bin, os.path.abspath(path), objdump_outfile)
 
                                 p = subprocess.Popen(
                                     "file %s | cut -d':' -f2" % os.path.abspath(path),
@@ -85,6 +90,25 @@ class Module(framework.module):
                                     stderr=subprocess.PIPE
                                 )
                                 stdout, stderr = p.communicate()
+                                info = stdout if not stderr else stderr
+                                logs += "$ file %s\n%s\n" % (
+                                    os.path.abspath(path),
+                                    info
+                                )
+
+                                p = subprocess.Popen(
+                                    "./libs/checksec.sh --file %s" % os.path.abspath(path),
+                                    shell=True,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE
+                                )
+                                stdout, stderr = p.communicate()
+                                checksec = stdout if not stderr else stderr
+                                logs += "$ checksec.sh %s\n%s\n" % (
+                                    os.path.abspath(path),
+                                    checksec
+                                )
+
                                 libs.append(
                                     {
                                         "name": m,
@@ -113,8 +137,10 @@ class Module(framework.module):
         if verbose:
             for lib in libs:
                 print "%s [%s] - %s" % (lib["name"], lib["arch"], lib["path"])
+            print "\n%s" % logs
 
         return {
             "results": libs,
-            "vulnerabilities": []
+            "logs": logs,
+            "vulnerabilities": vulnerabilities
         }
