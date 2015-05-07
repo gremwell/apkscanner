@@ -84,19 +84,39 @@ class Module(framework.module):
                                                     (objdump_bin, os.path.abspath(path), objdump_outfile)
 
                                 p = subprocess.Popen(
-                                    "file %s" % os.path.abspath(path),
+                                    "file %s | cut -d':' -f2" % os.path.abspath(path),
                                     shell=True,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE
                                 )
                                 stdout, stderr = p.communicate()
-                                logs += "$ file %s\n%s\n" % (os.path.abspath(path), stdout if not stderr else stderr)
+                                info = stdout if not stderr else stderr
+                                logs += "$ file %s\n%s\n" % (
+                                    os.path.abspath(path),
+                                    info
+                                )
+
+                                p = subprocess.Popen(
+                                    "./libs/checksec.sh --file %s" % os.path.abspath(path),
+                                    shell=True,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE
+                                )
+                                stdout, stderr = p.communicate()
+                                checksec = stdout if not stderr else stderr
+                                logs += "$ checksec.sh %s\n%s\n" % (
+                                    os.path.abspath(path),
+                                    checksec
+                                )
+
                                 libs.append(
                                     {
                                         "name": m,
                                         "arch": arch,
                                         "path": path,
-                                        "info": stdout if not stderr else stderr,
+                                        "info": info,
+                                        #remove ansi escapes
+                                        "checksec": re.sub(r'\x1b[^m]*m', '', checksec),
                                         "references": [
                                             {
                                                 "file": method.get_class_name()[1:-1],
