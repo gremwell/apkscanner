@@ -79,7 +79,7 @@ class Module(framework.module):
                                         #    raise Exception("An error occured when running objdump on %s" % path)
 
                                 p = subprocess.Popen(
-                                    "file %s" % os.path.abspath(path),
+                                    "file %s | cut -d':' -f2" % os.path.abspath(path),
                                     shell=True,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE
@@ -90,7 +90,9 @@ class Module(framework.module):
                                         "name": m,
                                         "arch": arch,
                                         "path": path,
-                                        "info": stdout if not stderr else stderr,
+                                        "info": info,
+                                        #remove ansi escapes
+                                        "checksec": re.sub(r'\x1b[^m]*m', '', checksec),
                                         "references": [
                                             {
                                                 "file": method.get_class_name()[1:-1],

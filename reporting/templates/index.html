@@ -189,11 +189,16 @@
                 </thead>
                 <tbody>
                 {% for lib in data["modules"]["info/native"]["run"]["results"] %}
+<<<<<<< HEAD
                     <tr>
                         <td><p>{{ lib["name"] }}</p></td>
                         <td><p>{{ lib["arch"] }}</p></td>
                         <td><p>{{ lib["info"] }}</p></td>
                     </tr>
+=======
+                    <tr><td>{{ lib["name"] }}</td><td>{{ lib["path"] }}</td><td>{{ lib["arch"] }}</td>
+                        <td>{{ lib["info"] }}<br /><br />{{ lib["checksec"]|replace("\n\n", "<br />")|replace(" ", "&nbsp&nbsp") }}</td></tr>
+>>>>>>> feature_checksec
                 {% endfor %}
                 </tbody>
                 </table>
