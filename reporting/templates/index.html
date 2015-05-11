@@ -189,16 +189,8 @@
                 </thead>
                 <tbody>
                 {% for lib in data["modules"]["info/native"]["run"]["results"] %}
-<<<<<<< HEAD
-                    <tr>
-                        <td><p>{{ lib["name"] }}</p></td>
-                        <td><p>{{ lib["arch"] }}</p></td>
-                        <td><p>{{ lib["info"] }}</p></td>
-                    </tr>
-=======
                     <tr><td>{{ lib["name"] }}</td><td>{{ lib["path"] }}</td><td>{{ lib["arch"] }}</td>
                         <td>{{ lib["info"] }}<br /><br />{{ lib["checksec"]|replace("\n\n", "<br />")|replace(" ", "&nbsp&nbsp") }}</td></tr>
->>>>>>> feature_checksec
                 {% endfor %}
                 </tbody>
                 </table>
@@ -221,7 +213,38 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-10 col-md-offset-2">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>API Calls</h4></div>
+
+            {% for api in data["modules"]["info/apis"]["run"]["results"] %}
+            <h4 class="panel-heading">{{ api }}</h4>
+
+                <table class="table">
+	    			<thead>
+                    <tr><td>Package</td><td>File</td></tr>
+                    </thead>
+                    <tbody>
+                {% for package in data["modules"]["info/apis"]["run"]["results"][api] %}
+                    {% for file in data["modules"]["info/apis"]["run"]["results"][api][package] %}
+                    <tr>
+                        <td>{{ package }}</td>
+                        <td>
+                            {{ file }} on lines
+                            {% for entry in data["modules"]["info/apis"]["run"]["results"][api][package][file] %}
+                                {{ entry['line'] }},
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+                    </tbody>
+                    </table>
+            {% endfor %}
+        </div>
+        </div>
+
+        <div class="col-md-10 col-md-offset-2">
             <div class="panel panel-default">
                 	<div class="panel-heading"><h4>System Services</h4></div>
 
