@@ -21,11 +21,11 @@ class Module(framework.module):
 
         results = {}
         apis = {
-            "crypto": [ "javax.crypto", "java.security", "android.security"],
-            "networking": ["java.net", "org.apache.http", "javax.net", "javax.net.ssl"],
+            "Crypto": ["javax.crypto", "java.security", "android.security"],
+            "Networking": ["java.net", "org.apache.http", "javax.net", "javax.net.ssl"],
             "IO": ["java.io"],
-            "comm": ["android.bluetooth", "android.net.sip", "android.net.wifi", "android.net.wifi.p2p", "android.nfc"],
-            "geolocation": ["android.location"]
+            "Communications": ["android.bluetooth", "android.net.sip", "android.net.wifi", "android.net.wifi.p2p", "android.nfc"],
+            "Geolocation": ["android.location"]
         }
         d = dvm.DalvikVMFormat(self.apk.get_dex())
         dx = VMAnalysis(d)
@@ -56,8 +56,13 @@ class Module(framework.module):
                                         "line": method.get_debug().get_line_start()
                                     }
                                 )
-        if verbose:
-            print results
+        for api in apis:
+            total = 0
+            for package in apis[api]:
+                total += len(results[api][package])
+            if not total:
+                del(results[api])
+
         return {
             "results": results,
             "logs": "",
