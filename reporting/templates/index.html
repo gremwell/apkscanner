@@ -121,6 +121,37 @@
 	</div>
 
         <div class="col-md-10 col-md-offset-2">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h4>API Calls</h4></div>
+
+            {% for api in data["modules"]["info/apis"]["run"]["results"] %}
+            <h4 class="panel-heading">{{ api }}</h4>
+
+                <table class="table">
+	    			<thead>
+                    <tr><td>Package</td><td>File</td></tr>
+                    </thead>
+                    <tbody>
+                {% for package in data["modules"]["info/apis"]["run"]["results"][api] %}
+                    {% for file in data["modules"]["info/apis"]["run"]["results"][api][package] %}
+                    <tr>
+                        <td>{{ package }}</td>
+                        <td>
+                            {{ file }} on lines
+                            {% for entry in data["modules"]["info/apis"]["run"]["results"][api][package][file] %}
+                                {{ entry['line'] }},
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+                    </tbody>
+                    </table>
+            {% endfor %}
+        </div>
+        </div>
+
+        <div class="col-md-10 col-md-offset-2">
             <div class="panel panel-default">
                 	<div class="panel-heading"><h4>System Services</h4></div>
                   	<div class="panel-body">
