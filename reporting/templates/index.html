@@ -200,22 +200,21 @@
             </div>
 
 			{% endif %}
-
-
 		</div>
 	</div>
+    </div>
 
-        <div class="col-md-10 col-md-offset-1">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4>Network capture <a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/network/capture.pcap" alt="download network capture"><button type="button" class="btn btn-default pull-right">Download</button></a></h4></div>
-                <div class="panel-body">
-                </div>
+    <div class="col-md-10 col-md-offset-1">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>Network capture <a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/network/capture.pcap" alt="download network capture"><button type="button" class="btn btn-default pull-right">Download</button></a></h4>
             </div>
         </div>
-        <div class="col-md-10 col-md-offset-2">
-		<div class="panel panel-default">
-			<div class="panel-heading"><h4>API Calls</h4></div>
+    </div>
+
+    <div class="col-md-10 col-md-offset-1">
+	    <div class="panel panel-default">
+		    <div class="panel-heading"><h4>API Calls</h4></div>
 
             {% for api in data["modules"]["info/apis"]["run"]["results"] %}
             <h4 class="panel-heading">{{ api }}</h4>
@@ -244,7 +243,7 @@
         </div>
         </div>
 
-        <div class="col-md-10 col-md-offset-2">
+        <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
                 	<div class="panel-heading"><h4>System Services</h4></div>
 
