@@ -182,15 +182,20 @@
                  <table class="table-responsive table-bordered table-hover">
                 <thead>
                 <tr>
-                    <th>NAME</th>
-                    <th>ARCH </th>
-					<th>DESCRIPTION</th>
+                    <th class="col-md-1" style="text-align:center;">NAME</th>
+                    <th style="text-align:center;">PATH </th>
+                    <th class="col-md-1" style="text-align:center;">ARCH </th>
+					<th class="col-md-8" style="text-align:center;">DESCRIPTION</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for lib in data["modules"]["info/native"]["run"]["results"] %}
-                    <tr><td>{{ lib["name"] }}</td><td>{{ lib["path"] }}</td><td>{{ lib["arch"] }}</td>
-                        <td>{{ lib["info"] }}<br /><br />{{ lib["checksec"]|replace("\n\n", "<br />")|replace(" ", "&nbsp&nbsp") }}</td></tr>
+                    <tr>
+                        <td><p style="text-align:center;">{{ lib["name"] }}</p></td>
+                        <td>{{ lib["path"] }}</td>
+                        <td><p style="text-align:center;">{{ lib["arch"] }}</p></td>
+                        <td><p style="text-align:center;">{{ lib["info"] }}</p></td>
+                    </tr>
                 {% endfor %}
                 </tbody>
                 </table>
