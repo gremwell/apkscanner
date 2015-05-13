@@ -570,9 +570,9 @@
         <script type="text/javascript">
 $(document).ready(function(){
     var internal_data = {{ internal_storage }};
-    $('#internal_storage').fileTree({ data: internal_data, sortable: true, selectable: true });
+    $('#internal_storage').fileTree({ data: internal_data });
     var external_data = {{ external_storage }};
-    $('#external_storage').fileTree({ data: external_data, sortable: true, selectable: true });
+    $('#external_storage').fileTree({ data: external_data });
     $('#logcat_search').on('keyup', function(evt) {
         var search = $('#logcat_search').val();
         if(search == "") {

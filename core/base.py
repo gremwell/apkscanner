@@ -245,7 +245,7 @@ class APKScanner(framework.module):
                 else:
                     d['id'] = path
                     d['name'] = os.path.basename(path)
-                    d['url'] = "file://%s" % path
+                    d['url'] = "file://%s" % os.path.abspath(path)
                     d['type'] = "file"
                 return d
 
