@@ -22,7 +22,15 @@ from android import *
 from jinja2 import Environment, FileSystemLoader
 import codecs
 
-
+try:
+    import scapy.all as scapy
+except ImportError:
+    import scapy
+try:
+    import scapy_http.http
+except ImportError:
+    from scapy.layers import http
+from scapy.error import Scapy_Exception
 
 
 # define colors for output
@@ -258,18 +266,41 @@ class APKScanner(framework.module):
                 "IPs": set()
             }
 
+
             loader = FileSystemLoader("./reporting/templates")
             env = Environment(loader=loader)
             internal_storage = json.dumps([path_to_dict("./analysis/%s/storage/data/data" % self.apk.get_package())])
             external_storage = json.dumps([path_to_dict("./analysis/%s/storage/sdcard" % self.apk.get_package())])
             template = env.get_template("index.html")
             analysis = json.load(open("./analysis/%s.json" % self.apk.get_package()))
+            network = {"DNS": [], "HTTP": [], "IP": []}
+            try:
+                packets = scapy.rdpcap("./analysis/%s/network/capture.pcap" % self.apk.get_package())
+                network["DNS"] = list(set([packet[scapy.DNSQR].qname for packet in packets if packet.haslayer(scapy.DNSQR)]))
+
+                for p in packets.filter(lambda(s): http.HTTPResponse in s):
+                    p.payload[http.HTTPResponse].payload = str(p.payload[http.HTTPResponse].payload).encode('hex')
+
+                network["HTTP"] = \
+                    [
+                        {
+                            "request": request.payload[http.HTTPRequest],
+                            "response": response.payload[http.HTTPResponse]
+                        }
+                        for request, response in \
+                        zip(
+                            packets.filter(lambda(s): http.HTTPRequest in s),
+                            packets.filter(lambda(s): http.HTTPResponse in s)
+                        )
+                    ]
+            except Scapy_Exception as e:
+                self.warning(e.message)
             _v = []
             for v in [analysis["modules"][module]["run"]["vulnerabilities"]
                       for module in analysis["modules"] if len(analysis["modules"][module]["run"]["vulnerabilities"])]:
                 _v += v
             html_out = template.render(data=analysis, logcat=logcat,
-                                       internal_storage=internal_storage,
+                                       network=network, internal_storage=internal_storage,
                                        external_storage=external_storage,
                                        vulnerabilities=_v,
                                        netcapture=netcapture)

@@ -214,6 +214,36 @@
             <div class="panel-heading">
                 <h4>Network capture <a href="../{{ data['modules']['info/app']['run']['results']['package_name'] }}/network/capture.pcap" alt="download network capture"><button type="button" class="btn btn-default pull-right">Download</button></a></h4>
             </div>
+            <h4 class="panel-heading">DNS</h4>
+            <table class="table">
+	    			<thead>
+                    <tr><td>Hostname</td></tr>
+                    </thead>
+                    <tbody>
+            {% for domain in network['DNS'] %}
+                <tr><td>{{ domain }}</td></tr>
+            {% endfor %}
+                </tbody>
+             </table>
+
+            <h4 class="panel-heading">HTTP</h4>
+            <table style="word-wrap:break-word;table-layout:fixed; width:100%;" class="table-responsive table-bordered">
+	    			<thead>
+                    <tr>
+                        <th style="text-align:center;">PAYLOAD</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for http in network['HTTP'] %}
+                        <tr>
+                            <td><pre>{{ http["request"] }}</pre></td>
+                        </tr>
+                        <tr>
+                            <td><pre>{{ http["response"] }}</pre></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
         </div>
     </div>
 
