@@ -24,7 +24,8 @@ class Module(framework.module):
             "Crypto": ["javax.crypto", "java.security", "android.security"],
             "Networking": ["java.net", "org.apache.http", "javax.net", "javax.net.ssl"],
             "IO": ["java.io"],
-            "Communications": ["android.bluetooth", "android.net.sip", "android.net.wifi", "android.net.wifi.p2p", "android.nfc"],
+            "Databases": ["android.database", "javax.sql", "java.sql"],
+            "Communications": ["android.telephony", "android.bluetooth", "android.net.sip", "android.net.wifi", "android.net.wifi.p2p", "android.nfc"],
             "Geolocation": ["android.location"]
         }
         d = dvm.DalvikVMFormat(self.apk.get_dex())
