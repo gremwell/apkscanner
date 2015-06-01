@@ -25,7 +25,9 @@ def main(arguments):
     apks = APKScanner(arguments)
     apks.analyze(module=arguments.module)
     apks.report("json")
-    apks.report("html")
+    if not arguments.module:
+        apks.report("html")
+        apks.summary()
 
 description = '%%(prog)s - %s %s' % (__author__, __email__)
 parser = argparse.ArgumentParser(description=description, version=__version__)

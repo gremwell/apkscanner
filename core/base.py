@@ -208,32 +208,15 @@ class APKScanner(framework.module):
             self.avd.shutdown()
 
         self.analysis["end_time"] = int(time.time())
-        self.summary()
 
     def summary(self):
         from datetime import date
-
         summary = "\n\n Analysis done - %s - %s\n" % (self.apk.get_package(), date.today().strftime("%Y%m%d"))
-        summary += "\n\t* Disassembled code: %s/analysis/%s/code" % (
-            self.root_dir,
-            self.apk.get_package()
-        )
-        summary += "\n\t* Logcat files: %s/analysis/%s/logs" % (
-            self.root_dir,
-            self.apk.get_package()
-        )
-        summary += "\n\t* Network capture: %s/analysis/%s/network" % (
-            self.root_dir,
-            self.apk.get_package()
-        )
-        summary += "\n\t* Device storage dump: %s/analysis/%s/storage" % (
-            self.root_dir,
-            self.apk.get_package()
-        )
-        summary += "\n\t* HTML report: %s/analysis/%s/report.html" % (
-            self.root_dir,
-            self.apk.get_package()
-        )
+        summary += "\n\t* Disassembled code: %s/analysis/%s/code" % (self.root_dir, self.apk.get_package())
+        summary += "\n\t* Logcat files: %s/analysis/%s/logs" % (self.root_dir, self.apk.get_package())
+        summary += "\n\t* Network capture: %s/analysis/%s/network" % (self.root_dir, self.apk.get_package())
+        summary += "\n\t* Device storage dump: %s/analysis/%s/storage" % (self.root_dir, self.apk.get_package())
+        summary += "\n\t* HTML report: %s/analysis/%s/report.html" % (self.root_dir, self.apk.get_package())
         summary += "\n\n"
         print summary
 
