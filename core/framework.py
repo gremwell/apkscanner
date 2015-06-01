@@ -41,6 +41,7 @@ class Vulnerability(object):
 class module(object):
     def __init__(self, apk=None, avd=None):
 
+        self.root_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
         self.log = logging.getLogger()
         fh = logging.FileHandler('aapt.log')
         self.log.setLevel(logging.INFO)

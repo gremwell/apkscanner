@@ -31,7 +31,7 @@ class Module(framework.module):
             try:
                 self.output("Application allow backup. Backing up data ...")
                 if not self.avd.headless:
-                    backup_location = "./analysis/%s/storage/backup" % self.apk.get_package()
+                    backup_location = "%s/analysis/%s/storage/backup" % (self.root_dir, self.apk.get_package())
                     if not os.path.exists(backup_location):
                         os.mkdir(backup_location)
                     if self.avd.backup(self.apk.get_package(), location="%s/backup.ab" % backup_location):

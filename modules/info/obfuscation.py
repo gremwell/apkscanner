@@ -22,8 +22,11 @@ class Module(framework.module):
 
         #proguard detection
         proguard = False
-        for root, dirs, files in os.walk("./analysis/%s/decompiled/%s" % (
-                self.apk.get_package(), "/".join(self.apk.get_package().split(".")))):
+        for root, dirs, files in os.walk("%s/analysis/%s/decompiled/%s" % (
+                self.root_dir,
+                self.apk.get_package(),
+                "/".join(self.apk.get_package().split("."))
+        )):
             for f in files:
                 if f in ["%s.java" % x for x in string.ascii_lowercase]:
                     proguard = True
@@ -32,14 +35,14 @@ class Module(framework.module):
 
         #1. use of unicode/chinese characters
         chinese_filenames = 0
-        for root, dirs, files in os.walk("./analysis/%s/smali" % (self.apk.get_package())):
+        for root, dirs, files in os.walk("%s/analysis/%s/smali" % (self.root_dir, self.apk.get_package())):
             for f in files:
                 for c in f:
                     if u'\u4e00' <= c <= u'\u9fff':
                         chinese_filenames += 1
 
         chinese_chars = 0
-        for root, dirs, files in os.walk("./analysis/%s/smali" % (self.apk.get_package())):
+        for root, dirs, files in os.walk("%s/analysis/%s/smali" % (self.root_dir, self.apk.get_package())):
             for filename in files:
                 with codecs.open(os.path.join(root, filename), "rb", "utf-8") as f:
                     for c in f.read():
@@ -48,7 +51,7 @@ class Module(framework.module):
 
         #2. Usage of huge arrays (> 1900 bytes)
         huge_arrays = 0
-        for root, dirs, files in os.walk("./analysis/%s/smali" % (self.apk.get_package())):
+        for root, dirs, files in os.walk("%s/analysis/%s/smali" % (self.root_dir, self.apk.get_package())):
             for filename in files:
                 with open(os.path.join(root, filename), 'rb') as f:
                     matches = re.findall(r'new-array ([^,]*),([^,]*),([^\n]*)\n', f.read())
@@ -58,7 +61,7 @@ class Module(framework.module):
 
         #3. Heavy use of reflection
         reflection = 0
-        for root, dirs, files in os.walk("./analysis/%s/smali" % (self.apk.get_package())):
+        for root, dirs, files in os.walk("%s/analysis/%s/smali" % (self.root_dir, self.apk.get_package())):
             for filename in files:
                 with open(os.path.join(root, filename), 'rb') as f:
                     matches = re.findall('r(Ljava/lang/reflect/[^;];)', f.read())
@@ -66,7 +69,7 @@ class Module(framework.module):
 
         #4. Dynamic Code Loading and Executing
         dexclassloader = 0
-        for root, dirs, files in os.walk("./analysis/%s/smali" % (self.apk.get_package())):
+        for root, dirs, files in os.walk("%s/analysis/%s/smali" % (self.root_dir, self.apk.get_package())):
             for filename in files:
                 with open(os.path.join(root, filename), 'rb') as f:
                     matches = re.findall('r(Ldalvik/system/DexClassLoader;)', f.read())
@@ -77,7 +80,7 @@ class Module(framework.module):
         #APKProtect detection
         # The string "APKProtected" is present in the dex
         apkprotect = False
-        for root, dirs, files in os.walk("./analysis/%s/smali" % (self.apk.get_package())):
+        for root, dirs, files in os.walk("%s/analysis/%s/smali" % (self.root_dir, self.apk.get_package())):
             for filename in files:
                 with open(os.path.join(root, filename), 'rb') as f:
                     if "APKProtected" in f.read():

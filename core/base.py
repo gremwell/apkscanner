@@ -32,7 +32,6 @@ except ImportError:
     from scapy.layers import http
 from scapy.error import Scapy_Exception
 
-
 # define colors for output
 # note: color in prompt effects
 # rendering of command history
@@ -96,7 +95,10 @@ class APKScanner(framework.module):
         self.output("Installing APK...")
         self.avd.install(self.apk.filename)
         self.avd.remount()
-        self.avd.push("./libs/busybox-android/busybox-android", "/system/xbin/busybox")
+        self.avd.push(
+            "%s/libs/busybox-android/busybox-android" % self.root_dir,
+            "/system/xbin/busybox"
+        )
         self.avd.shell("chmod 777 /system/bin/android-remote-install.sh")
         self.avd.unlock()
 
@@ -130,18 +132,40 @@ class APKScanner(framework.module):
                 self.deploy()
 
             if not os.path.exists("analysis/%s/" % self.apk.get_package()):
-                os.mkdir("analysis/%s/" % self.apk.get_package())
+                os.mkdir("%s/analysis/%s/" % (self.root_dir, self.apk.get_package()))
 
             self.output("Setting up logcat logger...")
-            if not os.path.exists("analysis/%s/logs" % self.apk.get_package()):
-                os.mkdir("analysis/%s/logs" % self.apk.get_package())
-            self.subprocesses.append(self.avd.logcat("analysis/%s/logs/logcat_pkg.log" % self.apk.get_package(), tag=self.apk.get_package()))
-            self.subprocesses.append(self.avd.logcat("analysis/%s/logs/logcat_full.log" % self.apk.get_package(), tag=None))
+            if not os.path.exists("%s/analysis/%s/logs" %
+                    (self.root_dir, self.apk.get_package())):
+                os.mkdir("%s/analysis/%s/logs" % (self.root_dir, self.apk.get_package()))
+            self.subprocesses.append(
+                self.avd.logcat(
+                    "%s/analysis/%s/logs/logcat_pkg.log" % (
+                        self.root_dir,
+                        self.apk.get_package()
+                    ),
+                    tag=self.apk.get_package()
+                )
+            )
+            self.subprocesses.append(
+                self.avd.logcat(
+                    "%s/analysis/%s/logs/logcat_full.log" % (
+                        self.root_dir,
+                        self.apk.get_package()
+                    ),
+                    tag=None
+                )
+            )
 
             self.output("Launching network capture ...")
-            if not os.path.exists("analysis/%s/network" % self.apk.get_package()):
-                os.mkdir("analysis/%s/network" % self.apk.get_package())
-            self.avd.start_traffic_capture("analysis/%s/network/capture.pcap" % (self.apk.get_package()))
+            if not os.path.exists("%s/analysis/%s/network" %
+                    (self.root_dir, self.apk.get_package())):
+                os.mkdir("%s/analysis/%s/network" %
+                         (self.root_dir, self.apk.get_package()))
+            self.avd.start_traffic_capture(
+                "%s/analysis/%s/network/capture.pcap" %
+                (self.root_dir, self.apk.get_package())
+            )
 
         try:
             modules = self.loaded_modules
@@ -174,7 +198,7 @@ class APKScanner(framework.module):
             self.teleport(self.avd)
 
             for pid in self.subprocesses:
-                os.kill(pid+1, signal.SIGTERM)
+                os.kill(pid + 1, signal.SIGTERM)
 
             self.output("Stopping network capture ...")
             self.avd.stop_traffic_capture()
@@ -188,25 +212,26 @@ class APKScanner(framework.module):
 
     def summary(self):
         from datetime import date
+
         summary = "\n\n Analysis done - %s - %s\n" % (self.apk.get_package(), date.today().strftime("%Y%m%d"))
         summary += "\n\t* Disassembled code: %s/analysis/%s/code" % (
-            os.path.dirname(os.path.realpath(__file__)),
+            self.root_dir,
             self.apk.get_package()
         )
         summary += "\n\t* Logcat files: %s/analysis/%s/logs" % (
-            os.path.dirname(os.path.realpath(__file__)),
+            self.root_dir,
             self.apk.get_package()
         )
         summary += "\n\t* Network capture: %s/analysis/%s/network" % (
-            os.path.dirname(os.path.realpath(__file__)),
+            self.root_dir,
             self.apk.get_package()
         )
         summary += "\n\t* Device storage dump: %s/analysis/%s/storage" % (
-            os.path.dirname(os.path.realpath(__file__)),
+            self.root_dir,
             self.apk.get_package()
         )
         summary += "\n\t* HTML report: %s/analysis/%s/report.html" % (
-            os.path.dirname(os.path.realpath(__file__)),
+            self.root_dir,
             self.apk.get_package()
         )
         summary += "\n\n"
@@ -239,7 +264,8 @@ class APKScanner(framework.module):
         Throws:
         """
         if fmt == "json":
-            with open("./analysis/%s.json" % self.apk.get_package(), "wb") as f:
+            with open("%s/analysis/%s.json" %
+                              (self.root_dir, self.apk.get_package()), "wb") as f:
                 f.write(json.dumps(self.analysis))
         elif fmt == "html":
             def path_to_dict(path):
@@ -258,27 +284,34 @@ class APKScanner(framework.module):
                 return d
 
             logcat = ""
-            with open("./analysis/%s/logs/logcat_full.log" % self.apk.get_package()) as f:
+            with open("%s/analysis/%s/logs/logcat_full.log" %
+                    (self.root_dir, self.apk.get_package())) as f:
                 logcat = f.read()
 
             netcapture = {
-                #"IPs":set((p[IP].src, p[IP].dst) for p in PcapReader('../analysis/%s/network/capture.pcap' % sys.argv[1]) if IP in p)
+                # "IPs":set((p[IP].src, p[IP].dst) for p in PcapReader('../analysis/%s/network/capture.pcap' % sys.argv[1]) if IP in p)
                 "IPs": set()
             }
 
-
-            loader = FileSystemLoader("./reporting/templates")
+            loader = FileSystemLoader("%s/reporting/templates" % self.root_dir)
             env = Environment(loader=loader)
-            internal_storage = json.dumps([path_to_dict("./analysis/%s/storage/data/data" % self.apk.get_package())])
-            external_storage = json.dumps([path_to_dict("./analysis/%s/storage/sdcard" % self.apk.get_package())])
+            internal_storage = json.dumps([
+                path_to_dict("%s/analysis/%s/storage/data/data" %
+                             (self.root_dir, self.apk.get_package()))])
+            external_storage = json.dumps([path_to_dict("%s/analysis/%s/storage/sdcard" %
+                                                        (self.root_dir,
+                                                         self.apk.get_package()))])
             template = env.get_template("index.html")
-            analysis = json.load(open("./analysis/%s.json" % self.apk.get_package()))
+            analysis = json.load(open("%s/analysis/%s.json" %
+                                      (self.root_dir, self.apk.get_package())))
             network = {"DNS": [], "HTTP": [], "IP": []}
             try:
-                packets = scapy.rdpcap("./analysis/%s/network/capture.pcap" % self.apk.get_package())
-                network["DNS"] = list(set([packet[scapy.DNSQR].qname for packet in packets if packet.haslayer(scapy.DNSQR)]))
+                packets = scapy.rdpcap("%s/analysis/%s/network/capture.pcap" %
+                                       (self.root_dir, self.apk.get_package()))
+                network["DNS"] = list(
+                    set([packet[scapy.DNSQR].qname for packet in packets if packet.haslayer(scapy.DNSQR)]))
 
-                for p in packets.filter(lambda(s): http.HTTPResponse in s):
+                for p in packets.filter(lambda (s): http.HTTPResponse in s):
                     p.payload[http.HTTPResponse].payload = str(p.payload[http.HTTPResponse].payload).encode('hex')
 
                 network["HTTP"] = \
@@ -289,8 +322,8 @@ class APKScanner(framework.module):
                         }
                         for request, response in \
                         zip(
-                            packets.filter(lambda(s): http.HTTPRequest in s),
-                            packets.filter(lambda(s): http.HTTPResponse in s)
+                            packets.filter(lambda (s): http.HTTPRequest in s),
+                            packets.filter(lambda (s): http.HTTPResponse in s)
                         )
                     ]
             except Scapy_Exception as e:
@@ -305,7 +338,8 @@ class APKScanner(framework.module):
                                        vulnerabilities=_v,
                                        netcapture=netcapture)
 
-            with codecs.open("./analysis/%s/report.html" % self.apk.get_package(), "w", "utf-8") as f:
+            with codecs.open("%s/analysis/%s/report.html" % (self.root_dir,
+                                                             self.apk.get_package()), "w", "utf-8") as f:
                 f.write(html_out)
             return
         else:
@@ -323,27 +357,38 @@ class APKScanner(framework.module):
         """
         try:
             self.output("Building analysis directory ...")
-            if not os.path.exists("./analysis"):
-                os.mkdir("./analysis")
-            if not os.path.exists("./analysis/%s" % self.apk.get_package()):
-                os.mkdir("./analysis/%s" % self.apk.get_package())
+            if not os.path.exists("%s/analysis" % self.root_dir):
+                os.mkdir("%s/analysis" % self.root_dir)
+            if not os.path.exists("%s/analysis/%s" %
+                    (self.root_dir, self.apk.get_package())):
+                os.mkdir("%s/analysis/%s" % (self.root_dir, self.apk.get_package()))
 
-            if not os.path.exists("./analysis/%s/code" % self.apk.get_package()):
-                os.mkdir("./analysis/%s/code" % self.apk.get_package())
+            if not os.path.exists("%s/analysis/%s/code" %
+                    (self.root_dir, self.apk.get_package())):
+                os.mkdir("%s/analysis/%s/code" % (self.root_dir, self.apk.get_package()))
 
-            dirs = ["orig", "smali", "jar", "decompiled", "native"]
-            for d in dirs:
-                if not os.path.exists("./analysis/%s/code/%s" % (self.apk.get_package(), d)):
-                    os.mkdir("./analysis/%s/code/%s" % (self.apk.get_package(), d))
+            for d in ["orig", "smali", "jar", "decompiled", "native"]:
+                if not os.path.exists("%s/analysis/%s/code/%s" %
+                        (self.root_dir, self.apk.get_package(), d)):
+                    os.mkdir("%s/analysis/%s/code/%s" %
+                             (self.root_dir, self.apk.get_package(), d))
 
             self.output("Unzipping APK file ...")
             with ZipFile(self.apk.get_filename()) as zipapk:
-                zipapk.extractall("./analysis/%s/code/orig" % (self.apk.get_package()))
+                zipapk.extractall("%s/analysis/%s/code/orig" %
+                                  (self.root_dir, self.apk.get_package()))
 
             self.output("Converting DEX to JAR ...")
             p = subprocess.Popen(
-                './libs/dex2jar/dex2jar ./analysis/%s/code/orig/classes.dex -f -o ./analysis/%s/code/jar/classes.jar  1>&2' %
-                (self.apk.get_package(), self.apk.get_package()),
+                '%s/libs/dex2jar/dex2jar %s/analysis/%s/code/orig/classes.dex '
+                '-f -o %s/analysis/%s/code/jar/classes.jar  1>&2' %
+                (
+                    self.root_dir,
+                    self.root_dir,
+                    self.apk.get_package(),
+                    self.root_dir,
+                    self.apk.get_package()
+                ),
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -354,8 +399,14 @@ class APKScanner(framework.module):
 
             self.output("Converting DEX to SMALI ...")
             p = subprocess.Popen(
-                './libs/baksmali ./analysis/%s/code/orig/classes.dex -o ./analysis/%s/code/smali 1>&2' %
-                (self.apk.get_package(), self.apk.get_package()),
+                '%s/libs/baksmali %s/analysis/%s/code/orig/classes.dex -o %s/analysis/%s/code/smali 1>&2' %
+                (
+                    self.root_dir,
+                    self.root_dir,
+                    self.apk.get_package(),
+                    self.root_dir,
+                    self.apk.get_package()
+                ),
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -366,8 +417,14 @@ class APKScanner(framework.module):
 
             self.output("Decompiling JAR file ...")
             p = subprocess.Popen(
-                './libs/jd ./analysis/%s/code/jar/classes.jar -od ./analysis/%s/code/decompiled 1>&2' %
-                (self.apk.get_package(), self.apk.get_package()),
+                '%s/libs/jd %s/analysis/%s/code/jar/classes.jar -od %s/analysis/%s/code/decompiled 1>&2' %
+                (
+                    self.root_dir,
+                    self.root_dir,
+                    self.apk.get_package(),
+                    self.root_dir,
+                    self.apk.get_package()
+                ),
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -377,7 +434,8 @@ class APKScanner(framework.module):
                 self.error(stderr)
 
             self.output("Converting Application Manifest to human readable format ...")
-            with open("./analysis/%s/code/orig/AndroidManifest.xml" % self.apk.get_package(), "w") as f:
+            with open("%s/analysis/%s/code/orig/AndroidManifest.xml" %
+                              (self.root_dir, self.apk.get_package()), "w") as f:
                 f.write(self.apk.get_android_manifest_xml().toprettyxml().decode('utf-8'))
 
         except Exception as e:
@@ -387,30 +445,44 @@ class APKScanner(framework.module):
         """Copy all application related files from the device to the analysis directory for further analysis.
         """
 
-        if not os.path.exists("./analysis/%s" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/storage" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/storage/" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/storage/sdcard" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/storage/sdcard" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/storage/data" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/storage/data" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/storage/data/data" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/storage/data/data" % self.apk.get_package())
-        if not os.path.exists("./analysis/%s/storage/data/data/%s" % (self.apk.get_package(), self.apk.get_package())):
-            os.mkdir("./analysis/%s/storage/data/data/%s" % (self.apk.get_package(), self.apk.get_package()))
-        if not os.path.exists("./analysis/%s/storage/data/system" % (self.apk.get_package())):
-            os.mkdir("./analysis/%s/storage/data/system" % (self.apk.get_package()))
+        if not os.path.exists("%s/analysis/%s" % (self.root_dir, self.apk.get_package())):
+            os.mkdir("%s/analysis/%s" % (self.root_dir, self.apk.get_package()))
+        if not os.path.exists("%s/analysis/%s/storage" % (
+        self.root_dir, self.apk.get_package())):
+            os.mkdir("%s/analysis/%s/storage/" % (self.root_dir, self.apk.get_package()))
+        if not os.path.exists("%s/analysis/%s/storage/sdcard" %
+                (self.root_dir, self.apk.get_package())):
+            os.mkdir(
+                "%s/analysis/%s/storage/sdcard" % (self.root_dir, self.apk.get_package()))
+        if not os.path.exists("%s/analysis/%s/storage/data" %
+                (self.root_dir, self.apk.get_package())):
+            os.mkdir(
+                "%s/analysis/%s/storage/data" % (self.root_dir, self.apk.get_package()))
+        if not os.path.exists("%s/analysis/%s/storage/data/data" %
+                (self.root_dir, self.apk.get_package())):
+            os.mkdir("%s/analysis/%s/storage/data/data" % (
+            self.root_dir, self.apk.get_package()))
+        if not os.path.exists("%s/analysis/%s/storage/data/data/%s" %
+                (self.root_dir, self.apk.get_package(), self.apk.get_package())):
+            os.mkdir("%s/analysis/%s/storage/data/data/%s" % (
+            self.root_dir, self.apk.get_package(), self.apk.get_package()))
+        if not os.path.exists("%s/analysis/%s/storage/data/system" %
+                (self.root_dir, self.apk.get_package())):
+            os.mkdir("%s/analysis/%s/storage/data/system" % (
+            self.root_dir, self.apk.get_package()))
 
         source = "/data/data/%s" % self.apk.get_package()
-        dest = "./analysis/%s/storage/data/data/%s/" % (self.apk.get_package(), self.apk.get_package())
+        dest = "%s/analysis/%s/storage/data/data/%s/" % \
+               (self.root_dir, self.apk.get_package(), self.apk.get_package())
         avd.pull(source, dest)
 
-        #search files owned by the application's user (u0_a46) in the sdcard mount point.
+        # search files owned by the application's user (u0_a46) in the sdcard mount point.
         #1. get application UID
         uid = None
-        avd.pull("/data/system/packages.list", "./analysis/%s/storage/data/system/" % self.apk.get_package())
-        with open("./analysis/%s/storage/data/system/packages.list" % self.apk.get_package(), "rb") as f:
+        avd.pull("/data/system/packages.list", "%s/analysis/%s/storage/data/system/" %
+                 (self.root_dir, self.apk.get_package()))
+        with open("%s/analysis/%s/storage/data/system/packages.list" %
+                          (self.root_dir, self.apk.get_package()), "rb") as f:
             for line in f.readlines():
                 if line.startswith(self.apk.get_package()):
                     uid = int(line.split(" ")[1])
@@ -420,7 +492,8 @@ class APKScanner(framework.module):
             self.output("Searching for files owned by user %d" % uid)
             files = avd.shell("/system/xbin/busybox find /sdcard -type f -user %d" % uid)
             for f in [x for x in files.split("\n") if len(x)]:
-                print avd.pull(f, "./analysis/%s/storage/sdcard" % self.apk.get_package())
+                print avd.pull(f, "%s/analysis/%s/storage/sdcard" %
+                               (self.root_dir, self.apk.get_package()))
         return
 
     def find_avd(self):
@@ -436,7 +509,7 @@ class APKScanner(framework.module):
                     return avd
 
             self.alert("AVD not found, searching for targets ...")
-            targets = [] #Android.get_targets()
+            targets = []  # Android.get_targets()
             t = None
             for target in targets:
                 if int(self.apk.get_min_sdk_version()) <= target.api_level <= int(self.apk.get_target_sdk_version()):
@@ -471,10 +544,13 @@ class APKScanner(framework.module):
                                     int(self.apk.get_target_sdk_version()):
                                 t = target
                                 break
-            self.alert("Creating AVD... [%s, %s, %s]" % (Android.get_devices()[0].id, t.api_level, t.skins.split(",")[0]))
-            name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
+            self.alert(
+                "Creating AVD... [%s, %s, %s]" % (Android.get_devices()[0].id, t.api_level, t.skins.split(",")[0]))
+            name = ''.join(
+                random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
             while name in [avd.name for avd in Android.get_avds()]:
-                name = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
+                name = ''.join(
+                    random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(8))
             if t.tag_abis is not None:
                 return AVD.create(name, t.id, Android.get_devices()[0].id, tag_abi=t.tag_abis[0], sdcard="512M")
             else:

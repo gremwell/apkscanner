@@ -36,7 +36,8 @@ class Module(framework.module):
                 if self.avd is not None:
                     output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
                     time.sleep(1)
-                    self.avd.screenshot("./analysis/%s/screenshots/%s.png" % (self.apk.get_package(), activity["name"]))
+                    self.avd.screenshot("%s/analysis/%s/screenshots/%s.png" %
+                                        (self.root_dir, self.apk.get_package(), activity["name"]))
                     activity["screenshot"] = "screenshots/%s.png" % (activity["name"])
                     logs += "$ adb shell am start -n %s/%s\n%s\n" % (self.apk.get_package(), activity["name"], output)
                     if "Error" in output:
