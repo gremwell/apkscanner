@@ -43,11 +43,13 @@ class module(object):
 
         self.root_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
         self.log = logging.getLogger()
-        fh = logging.FileHandler('aapt.log')
         self.log.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
-        self.log.addHandler(fh)
+        self.log.propagate = False
+        if not len(self.log.handlers):
+            fh = logging.FileHandler('aapt.log')
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            fh.setFormatter(formatter)
+            self.log.addHandler(fh)
         self.loaded = False
         self.module_delimiter = '/'
         self.apk = apk
