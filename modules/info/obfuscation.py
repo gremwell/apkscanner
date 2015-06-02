@@ -18,11 +18,13 @@ class Module(framework.module):
             "Comments": []
         }
 
+
+
     def module_run(self, verbose=False):
 
         #proguard detection
         proguard = False
-        for root, dirs, files in os.walk("%s/analysis/%s/decompiled/%s" % (
+        for root, dirs, files in os.walk("%s/analysis/%s/code/decompiled/%s" % (
                 self.root_dir,
                 self.apk.get_package(),
                 "/".join(self.apk.get_package().split("."))
@@ -88,14 +90,14 @@ class Module(framework.module):
 
         dexguard = (dexclassloader > 0 and chinese_chars > 0 and chinese_filenames > 0)
 
+        obfuscator = None
         if dexguard:
             obfuscator = "Dexguard"
-        elif proguard:
+        if proguard:
             obfuscator = "Proguard"
-        elif apkprotect:
+        if apkprotect:
             obfuscator = "APKProtect"
-        else:
-            obfuscator = None
+
 
         if verbose and obfuscator is not None:
             print "Obfuscator : %s" % obfuscator
