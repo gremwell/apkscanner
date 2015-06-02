@@ -40,7 +40,10 @@ class Module(framework.module):
                 continue
             mx = dx.get_method(method)
             ms = decompile.DvMethod(mx)
-            ms.process()
+            try:
+                    ms.process()
+            except AttributeError as e:
+                self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
             source = ms.get_source()
             matches = re.findall(r'addURI\("([^"]*)", "([^"]*)"', source)
             for match in matches:

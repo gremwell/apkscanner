@@ -87,7 +87,10 @@ class Module(framework.module):
             mx = dx.get_method(method)
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
                 ms = decompile.DvMethod(mx)
-                ms.process()
+                try:
+                    ms.process()
+                except AttributeError as e:
+                    self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
                 source = ms.get_source()
                 matches = re.findall(r'getSystemService\("([^"]*)"\)', source)
                 if len(matches):

@@ -32,8 +32,10 @@ class Module(framework.module):
                     continue
                 mx = dx.get_method(method)
                 ms = decompile.DvMethod(mx)
-                ms.process()
-
+                try:
+                    ms.process()
+                except AttributeError as e:
+                    self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
                 if method.get_class_name()[1:-1] not in results:
                     results[method.get_class_name()[1:-1]] = []
 
@@ -45,6 +47,7 @@ class Module(framework.module):
                             "line": method.get_debug().get_line_start()
                         }
                     )
+
 
         return {
             "results": results,

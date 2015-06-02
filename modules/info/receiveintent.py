@@ -164,7 +164,7 @@ class Module(framework.module):
     def __init__(self, apk, avd):
         super(Module, self).__init__(apk, avd)
         self.info = {
-            "Name": "Application intents analyzer",
+            "Name": "Application intents receiver analyzer",
             "Author": "Quentin Kaiser (@QKaiser)",
             "Description": "This module will extract intents creations from the code and assess to which receiver it is"
                            "sent and which data is being transmitted.",
@@ -186,7 +186,10 @@ class Module(framework.module):
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
                 mx = dx.get_method(method)
                 ms = decompile.DvMethod(mx)
-                ms.process()
+                try:
+                    ms.process()
+                except AttributeError as e:
+                    self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
                 source = ms.get_source()
 
                 #might be interesting to get the action expected by the activity if there is a call to getAction()
