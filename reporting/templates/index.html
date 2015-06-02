@@ -113,14 +113,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% set labels = {"signatureOrSystem": "warning", "unknown": "default", "dangerous": "danger", "normal": "info"} %}
+                {% set labels = {"signatureOrSystem": "danger", "signature": "danger", "unknown": "default", "dangerous": "warning", "normal": "info"} %}
                 {% for name in data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"] %}
 				    {% set label = "btn btn-%s" % labels[data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["status"]] %}
                     <tr>
                         <td>{{ name }}</td>
                         <td>{{ data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["description"] }}</td>
                         <td>
-                            <div class="{{ label }}" style="width:100%;background-color:#777;border:none;color:white;">
+
+                            <div class="{{ label }}" style="width:100%;border:none;color:white;">
                             {{data["modules"]["permissions/granting"]["run"]["results"]["manifest_permissions"][name]["status"] }}
                             </div>
                         </td>
