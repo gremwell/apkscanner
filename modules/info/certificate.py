@@ -75,7 +75,7 @@ class Module(framework.module):
                 framework.Vulnerability(
                     "Certificate has expired.",
                     "The application certificate has expired.",
-                    framework.Vulnerability.LOW
+                    framework.Vulnerability.INFO
                 ).__dict__
             )
 
@@ -84,7 +84,7 @@ class Module(framework.module):
                 framework.Vulnerability(
                     "Certificate is not verified.",
                     "The application certificate could not be verified.",
-                    framework.Vulnerability.LOW
+                    framework.Vulnerability.INFO
                 ).__dict__
             )
 
@@ -93,7 +93,7 @@ class Module(framework.module):
                 framework.Vulnerability(
                     "Debug certificate.",
                     "The application has been packaged with a debug certificate.",
-                    framework.Vulnerability.LOW,
+                    framework.Vulnerability.INFO,
                     logs=result["issuer"]
                 ).__dict__
             )

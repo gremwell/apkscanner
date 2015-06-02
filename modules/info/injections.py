@@ -52,9 +52,9 @@ class Module(framework.module):
             "results": results,
             "vulnerabilities": [framework.Vulnerability(
             "Multiple SQL injection vectors.",
-            "The application do not make use of prepared statement which could lead to SQL injection vulnerabilities."
+            "The application do not make use of prepared statement which could lead to SQL injection vulnerabilities.\n"
             "Review the results to see if these raw queries can be exploited.",
-            framework.Vulnerability.LOW,
+            framework.Vulnerability.MEDIUM,
             resources=results
         ).__dict__] if len(results) else []
         }

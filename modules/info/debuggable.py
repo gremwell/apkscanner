@@ -78,8 +78,9 @@ class Module(framework.module):
             "results": debuggable,
             "vulnerabilities": [framework.Vulnerability(
                 "The application is debuggable",
-                "The application is set to debuggable. This setting allow anyone to connect a debugger like jdb to the "
-                "running process.",
+                "The application is set to debuggable. A malicious application can subvert the integrity and "
+                "confidentiality of the vulnerable application by connecting to its debug port.\n"
+                "The application can be easily reversed engineered.",
                 framework.Vulnerability.HIGH,
                 logs=logs
             ).__dict__] if debuggable else []
