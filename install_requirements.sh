@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt-get update
-sudo apt-get install default-jdk default-jre swig python-virtualenv python-dev libffi-dev libxslt-dev libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 -y
+sudo apt-get install wget openssl libssl-dev tcpdump default-jdk default-jre swig python-virtualenv python-dev libffi-dev libxslt-dev libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 -y
 
 ANDROID_SDK="http://dl.google.com/android/android-sdk_r24.0.2-linux.tgz"
 MACHINE_TYPE=`uname -m`
@@ -28,8 +28,8 @@ if [ -z `which ndk-build` ]; then
 fi
 echo 'export PATH=$PATH:~/android-sdk-linux/tools:~/android-sdk-linux/platform-tools:~/android-ndk-r10d'  >> ~/.profile
 source ~/.profile
-platform_tools=`android list sdk -a -e | grep "platform-tools" | cut -d' ' -f2`
-sdk_tools=`android list sdk -a -e | grep "\"tools\"" | cut -d' ' -f2`
-build_tools=`android list sdk -a -e | grep "build-tools" | head -n1 | cut -d' ' -f2`
-while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t $platform_tools,$build_tools,$sdk_tools
+platform_tools=`android list sdk -a -e | grep "platform-tools" | cut -d' ' -f2 | tr '\n' ','`
+sdk_tools=`android list sdk -a -e | grep "\"tools\"" | cut -d' ' -f2 | tr '\n' ','`
+build_tools=`android list sdk -a -e | grep "build-tools" | head -n1 | cut -d' ' -f2 | tr '\n' ','`
+while [ 1 ]; do sleep 1; echo y; done | android update sdk -u -a -t $platform_tools$build_tools$sdk_tools
 exit 0
