@@ -19,7 +19,6 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        logs = ""
         results = []
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -34,7 +33,10 @@ class Module(framework.module):
             mx = dx.get_method(method)
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
                 ms = decompile.DvMethod(mx)
-                ms.process()
+                try:
+                    ms.process()
+                except AttributeError as e:
+                    self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
                 if method.get_class_name()[1:-1] not in [x["file"] for x in results]:
                     results.append({
                         "file": method.get_class_name()[1:-1],
@@ -46,15 +48,13 @@ class Module(framework.module):
                             if method.get_debug().get_line_start() not in r["lines"]:
                                 r["lines"].append(method.get_debug().get_line_start())
 
-        vulnerabilities = [framework.Vulnerability(
-            "Multiple SQL injection vectors.",
-            "The application do not make use of prepared statement which could lead to SQL injection vulnerabilities."
-            "Review the results to see if these raw queries can be exploited.",
-            framework.Vulnerability.LOW
-        ).__dict__] if len(results) else []
-
         return {
             "results": results,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": [framework.Vulnerability(
+            "Multiple SQL injection vectors.",
+            "The application do not make use of prepared statement which could lead to SQL injection vulnerabilities.\n"
+            "Review the results to see if these raw queries can be exploited.",
+            framework.Vulnerability.MEDIUM,
+            resources=results
+        ).__dict__] if len(results) else []
         }

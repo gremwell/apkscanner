@@ -57,7 +57,6 @@ class Module(framework.module):
                 if stderr:
                     raise Exception(stderr)
                 else:
-
                     p = subprocess.Popen(
                         "echo 'classes' | jdb -attach localhost:54321 | grep %s" % self.apk.get_package(),
                         shell=True,
@@ -77,11 +76,12 @@ class Module(framework.module):
 
         return {
             "results": debuggable,
-            "logs": logs,
             "vulnerabilities": [framework.Vulnerability(
                 "The application is debuggable",
-                "The application is set to debuggable. This setting allow anyone to connect a debugger like jdb to the "
-                "running process.",
-                framework.Vulnerability.MEDIUM
-            ).__dict__] if debuggable is True else []
+                "The application is set to debuggable. A malicious application can subvert the integrity and "
+                "confidentiality of the vulnerable application by connecting to its debug port.\n"
+                "The application can be easily reversed engineered.",
+                framework.Vulnerability.HIGH,
+                logs=logs
+            ).__dict__] if debuggable else []
         }

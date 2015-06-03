@@ -1,0 +1,53 @@
+# Add Android API calls references (crypto, network, files, ...)
+
+execute search with androguard per package
+
+crypto / ACLs
+
+    * javax.crypto
+    * java.security
+    * android.security
+
+networking
+
+    * java.net
+    * org.apache.http
+    * javax.net
+    * javax.net.ssl
+
+files
+
+    * java.io
+
+net comm
+
+    * android.bluetooth
+    * android.net.sip
+    * android.net.wifi
+    * android.net.wifi.p2p
+    * android.nfc
+
+location
+
+    * android.location
+
+
+
+
+
+# Add pcap analysis result to report (dns, http)
+
+    ## DNS extraction from pcap
+
+        dnsPackets = rdpcap(dnsPcap)
+        domain = 'stackoverflow.com'
+
+        for packet in dnsPackets:
+            if packet.haslayer(DNSQR):
+                query = packet[DNSQR].qname
+                if domain in query:
+                    outFile.write(query + '\n')
+
+    ## HTTP extraction from pcap
+
+        http://blog.sbarbeau.fr/2011/06/http-support-in-scapy.html

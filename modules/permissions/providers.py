@@ -22,7 +22,7 @@ class Module(framework.module):
     def module_run(self, verbose=False):
 
         logs = ""
-        vulnerabilities = []
+        vulnerable = False
         providers = self.get_providers()
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -40,7 +40,10 @@ class Module(framework.module):
                 continue
             mx = dx.get_method(method)
             ms = decompile.DvMethod(mx)
-            ms.process()
+            try:
+                    ms.process()
+            except AttributeError as e:
+                self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
             source = ms.get_source()
             matches = re.findall(r'addURI\("([^"]*)", "([^"]*)"', source)
             for match in matches:
@@ -59,12 +62,7 @@ class Module(framework.module):
                         logs += "$ adb shell content query --uri %s\n" % uri
                         logs += self.avd.shell("content query --uri %s" % uri)
                 provider["vulnerable"] = True
-                vulnerabilities.append(framework.Vulnerability(
-                    "Exported content provider.",
-                    "The following application provider is exported, which means that any application can access it"
-                    " without the need for any custom permission.",
-                    framework.Vulnerability.MEDIUM
-                ).__dict__)
+                vulnerable = True
             else:
                 provider["vulnerable"] = False
 
@@ -72,6 +70,13 @@ class Module(framework.module):
             print logs
         return {
             "results": providers,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": [
+                framework.Vulnerability(
+                    "Exported content provider.",
+                    "The following application provider is exported, which means that any application can access it"
+                    " without the need for any custom permission.",
+                    framework.Vulnerability.MEDIUM,
+                    resources=[p for p in providers if p["vulnerable"]],
+                    logs=logs
+                ).__dict__] if vulnerable else []
         }

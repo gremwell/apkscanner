@@ -39,18 +39,21 @@ class Module(framework.module):
 
             mx = dx.get_method(method)
             ms = decompile.DvMethod(mx)
-            ms.process()
+            try:
+                    ms.process()
+            except AttributeError as e:
+                self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
             source = ms.get_source()
             matches = re.findall(r'System\.loadLibrary\("([^"]*)"\)', source)
 
             if len(matches):
                 for m in matches:
                     for arch in ["armeabi", "armeabiv7", "x86", "mipsel"]:
-                        path = "./analysis/%s/code/orig/lib/%s/lib%s.so" % (self.apk.get_package(), arch, m)
+                        path = "%s/analysis/%s/code/orig/lib/%s/lib%s.so" % \
+                               (self.root_dir, self.apk.get_package(), arch, m)
                         if path not in [x["path"] for x in libs]:
                             if os.path.exists(path):
-                                copy(path, "./analysis/%s/code/native" % self.apk.get_package())
-
+                                copy(path, "%s/analysis/%s/code/native" % (self.root_dir, self.apk.get_package()))
                                 ndk_path = None
                                 for p in os.environ["PATH"].split(":"):
                                     if os.path.exists(os.path.join(p, "ndk-build")):
@@ -69,7 +72,9 @@ class Module(framework.module):
                                                     break
 
                                 if objdump_bin is not None:
-                                    objdump_outfile = "./analysis/%s/code/native/lib%s.objdump" % (self.apk.get_package(), m)
+                                    objdump_outfile = \
+                                        "%s/analysis/%s/code/native/lib%s.objdump" %\
+                                        (self.root_dir, self.apk.get_package(), m)
                                     with open(objdump_outfile, "wb") as f:
                                         exitcode = subprocess.call(
                                             "%s -D %s" % (objdump_bin, os.path.abspath(path)),
@@ -84,19 +89,39 @@ class Module(framework.module):
                                                     (objdump_bin, os.path.abspath(path), objdump_outfile)
 
                                 p = subprocess.Popen(
-                                    "file %s" % os.path.abspath(path),
+                                    "file %s | cut -d':' -f2" % os.path.abspath(path),
                                     shell=True,
                                     stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE
                                 )
                                 stdout, stderr = p.communicate()
-                                logs += "$ file %s\n%s\n" % (os.path.abspath(path), stdout if not stderr else stderr)
+                                info = stdout if not stderr else stderr
+                                logs += "$ file %s\n%s\n" % (
+                                    os.path.abspath(path),
+                                    info
+                                )
+
+                                p = subprocess.Popen(
+                                    "%s/libs/checksec.sh --file %s" % (self.root_dir, os.path.abspath(path)),
+                                    shell=True,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE
+                                )
+                                stdout, stderr = p.communicate()
+                                checksec = stdout if not stderr else stderr
+                                logs += "$ checksec.sh %s\n%s\n" % (
+                                    os.path.abspath(path),
+                                    checksec
+                                )
+
                                 libs.append(
                                     {
                                         "name": m,
                                         "arch": arch,
                                         "path": path,
-                                        "info": stdout if not stderr else stderr,
+                                        "info": info,
+                                        #remove ansi escapes
+                                        "checksec": re.sub(r'\x1b[^m]*m', '', checksec),
                                         "references": [
                                             {
                                                 "file": method.get_class_name()[1:-1],

@@ -18,9 +18,8 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        vulnerabilities = []
         webviews = []
-
+        vulnerable = False
         funcs = [
             {
                 "name": "setJavaScriptEnabled",
@@ -76,9 +75,13 @@ class Module(framework.module):
                 }
                 mx = dx.get_method(method)
                 ms = decompile.DvMethod(mx)
-                ms.process()
-                source = ms.get_source()
 
+                try:
+                    ms.process()
+                except AttributeError as e:
+                    self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
+
+                source = ms.get_source()
                 for func in funcs:
                     matches = re.findall(r'%s\((.*?)\);' % func["name"], source)
                     if len(matches) == 1:
@@ -87,16 +90,19 @@ class Module(framework.module):
                         webview[func["name"]] = func["default"]
                 webviews.append(webview)
 
+
         for webview in webviews:
             if webview["setJavaScriptEnabled"]:
-                vulnerabilities.append(framework.Vulnerability(
-                    "Explicitly enabled Javascript in WebViews",
-                    "The application explicitly enable Javascript for multiple webviews.",
-                    framework.Vulnerability.LOW
-                ).__dict__)
+                vulnerable = True
 
         return {
             "results": webviews,
             "logs": "",
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": [
+                framework.Vulnerability(
+                    "Explicitly enabled Javascript in WebViews",
+                    "The application explicitly enable Javascript for multiple webviews.",
+                    framework.Vulnerability.MEDIUM,
+                    resources=webviews
+                ).__dict__] if vulnerable else []
         }

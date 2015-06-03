@@ -14,7 +14,7 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
         services = self.get_services()
-        vulnerabilities = []
+        vulnerable = False
         logs = ""
         for service in services:
             service["vulnerable"] = False
@@ -24,13 +24,7 @@ class Module(framework.module):
                     logs += "$ adb shell am startservice -n %s/%s\n%s\n" % (self.apk.get_package(), service["name"], output)
                     if "Error: Not found; no service started." not in output:
                         service["vulnerable"] = True
-                        vulnerabilities.append(
-                            framework.Vulnerability(
-                                "Potentially vulnerable service component.",
-                                "The following services were found to be vulnerable.",
-                                framework.Vulnerability.LOW
-                            ).__dict__
-                        )
+                        vulnerable = True
                     #force-stop was only introduced in honeycomb
                     if self.avd.target > 12:
                         output = self.avd.shell("am force-stop %s" % (self.apk.get_package()))
@@ -39,7 +33,12 @@ class Module(framework.module):
             print logs
 
         return {
-            "logs": logs,
             "results": services,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": [framework.Vulnerability(
+                "Potentially vulnerable service component.",
+                "The following services were found to be vulnerable.",
+                framework.Vulnerability.LOW,
+                resources=[s for s in services if s["vulnerable"]],
+                logs=logs
+            ).__dict__] if vulnerable else []
         }

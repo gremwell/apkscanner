@@ -19,8 +19,6 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        logs = ""
-        vulnerabilities = []
         results = {}
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -41,7 +39,10 @@ class Module(framework.module):
             mx = dx.get_method(method)
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
                 ms = decompile.DvMethod(mx)
-                ms.process()
+                try:
+                    ms.process()
+                except AttributeError as e:
+                    self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
                 if method.get_class_name()[1:-1] not in results:
                     results[method.get_class_name()[1:-1]] = []
 
@@ -55,6 +56,5 @@ class Module(framework.module):
 
         return {
             "results": results,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": []
         }

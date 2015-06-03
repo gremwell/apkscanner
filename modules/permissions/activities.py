@@ -19,8 +19,8 @@ class Module(framework.module):
     def module_run(self, verbose=False):
 
         logs = ""
-        vulnerabilities = []
         activities = self.get_activities()
+        vulnerable = False
 
         for activity in activities:
             launcher = False
@@ -31,22 +31,26 @@ class Module(framework.module):
                     launcher = True
 
             if not launcher and (activity["exported"] and activity["permission"] is None):
+                activity["vulnerable"] = True
+                vulnerable = True
                 if self.avd is not None:
                     output = self.avd.shell("am start -n %s/%s" % (self.apk.get_package(), activity["name"]))
                     time.sleep(1)
-                    self.avd.screenshot("./analysis/%s/screenshots/%s.png" % (self.apk.get_package(), activity["name"]))
+                    self.avd.screenshot("%s/analysis/%s/screenshots/%s.png" %
+                                        (self.root_dir, self.apk.get_package(), activity["name"]))
                     activity["screenshot"] = "screenshots/%s.png" % (activity["name"])
                     logs += "$ adb shell am start -n %s/%s\n%s\n" % (self.apk.get_package(), activity["name"], output)
-                    if "Error" not in output:
-                        activity["vulnerable"] = True
-                        vulnerabilities.append(
-                            framework.Vulnerability("Potentially vulnerable activity component.",
-                                                    "The following activities were found to be vulnerable.",
-                                                    framework.Vulnerability.LOW).__dict__
-                        )
+                    if "Error" in output:
+                        activity["vulnerable"] = False
 
         return {
             "results": activities,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": [
+                framework.Vulnerability(
+                    "Potentially vulnerable activity components.",
+                    "The following activities were found to be vulnerable.",
+                    framework.Vulnerability.LOW,
+                    resources=[a for a in activities if a["vulnerable"]],
+                    logs=logs
+            ).__dict__] if vulnerable else []
         }

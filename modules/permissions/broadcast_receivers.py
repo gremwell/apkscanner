@@ -295,9 +295,10 @@ class Module(framework.module):
         }
 
     def module_run(self, verbose=False):
+
         logs = ""
-        vulnerabilities = []
         receivers = self.get_receivers()
+        vulnerable = False
 
         #for each action by categories, send intent and see what happen
         for receiver in receivers:
@@ -318,13 +319,8 @@ class Module(framework.module):
                         logs += "$ adb shell am broadcast -a %s -c %s -n %s/%s\n%s\n" % \
                                 (intent['action'], intent["category"], self.apk.get_package(), receiver["name"], output)
                         receiver["vulnerable"] = True
-                        vulnerabilities.append(
-                            framework.Vulnerability(
-                                "Unprotected broadcast receiver.",
-                                "The following broadcast receivers were found to be vulnerable.",
-                                framework.Vulnerability.LOW
-                            ).__dict__
-                        )
+                        vulnerable = True
+
 
                 if not len(receiver["intent_filters"]):
                     for category in categories:
@@ -337,16 +333,16 @@ class Module(framework.module):
                                 logs += "$ adb shell am broadcast -a %s -c %s -n %s/%s\n%s\n" % \
                                         (action, category, self.apk.get_package(), receiver["name"], output)
                                 receiver["vulnerable"] = True
-                                vulnerabilities.append(
-                                    framework.Vulnerability(
-                                        "Unprotected broadcast receiver.",
-                                        "The following broadcast receivers were found to be vulnerable.",
-                                        framework.Vulnerability.LOW
-                                    ).__dict__
-                                )
+                                vulnerable = True
 
         return {
             "results": receivers,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": [
+                framework.Vulnerability(
+                    "Unprotected broadcast receiver.",
+                    "The following broadcast receivers were found to be vulnerable.",
+                    framework.Vulnerability.LOW,
+                    resources=[r for r in receivers if r["vulnerable"]],
+                    logs=logs
+            ).__dict__] if vulnerable else []
         }

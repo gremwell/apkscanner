@@ -173,8 +173,6 @@ class Module(framework.module):
 
     def module_run(self, verbose=False):
 
-        logs = ""
-        vulnerabilities = []
         results = []
 
         d = dvm.DalvikVMFormat(self.apk.get_dex())
@@ -188,7 +186,10 @@ class Module(framework.module):
             if self.apk.get_package() in method.get_class_name().replace("/", "."):
                 mx = dx.get_method(method)
                 ms = decompile.DvMethod(mx)
-                ms.process()
+                try:
+                    ms.process()
+                except AttributeError as e:
+                    self.warning("Error while processing disassembled Dalvik method: %s" % e.message)
                 source = ms.get_source()
                 matches = re.findall(r'Intent\(([^\)]*)\);', source)
                 if len(matches):
@@ -199,6 +200,5 @@ class Module(framework.module):
 
         return {
             "results": results,
-            "logs": logs,
-            "vulnerabilities": vulnerabilities
+            "vulnerabilities": []
         }
