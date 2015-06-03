@@ -267,9 +267,10 @@ class APKScanner(framework.module):
                 return d
 
             logcat = ""
-            with open("%s/analysis/%s/logs/logcat_full.log" %
-                    (self.root_dir, self.apk.get_package())) as f:
-                logcat = f.read()
+            if os.path.exists("%s/analysis/%s/logs/logcat_full.log" % (self.root_dir, self.apk.get_package())):
+                with open("%s/analysis/%s/logs/logcat_full.log" %
+                        (self.root_dir, self.apk.get_package())) as f:
+                    logcat = f.read()
 
             netcapture = {
                 # "IPs":set((p[IP].src, p[IP].dst) for p in PcapReader('../analysis/%s/network/capture.pcap' % sys.argv[1]) if IP in p)
@@ -288,29 +289,30 @@ class APKScanner(framework.module):
             analysis = json.load(open("%s/analysis/%s.json" %
                                       (self.root_dir, self.apk.get_package())))
             network = {"DNS": [], "HTTP": [], "IP": []}
-            try:
-                packets = scapy.rdpcap("%s/analysis/%s/network/capture.pcap" %
-                                       (self.root_dir, self.apk.get_package()))
-                network["DNS"] = list(
-                    set([packet[scapy.DNSQR].qname for packet in packets if packet.haslayer(scapy.DNSQR)]))
+            if os.path.exists("%s/analysis/%s/network/capture.pcap" % (self.root_dir, self.apk.get_package())):
+                try:
+                    packets = scapy.rdpcap("%s/analysis/%s/network/capture.pcap" %
+                                           (self.root_dir, self.apk.get_package()))
+                    network["DNS"] = list(
+                        set([packet[scapy.DNSQR].qname for packet in packets if packet.haslayer(scapy.DNSQR)]))
 
-                for p in packets.filter(lambda (s): http.HTTPResponse in s):
-                    p.payload[http.HTTPResponse].payload = str(p.payload[http.HTTPResponse].payload).encode('hex')
+                    for p in packets.filter(lambda (s): http.HTTPResponse in s):
+                        p.payload[http.HTTPResponse].payload = str(p.payload[http.HTTPResponse].payload).encode('hex')
 
-                network["HTTP"] = \
-                    [
-                        {
-                            "request": request.payload[http.HTTPRequest],
-                            "response": response.payload[http.HTTPResponse]
-                        }
-                        for request, response in \
-                        zip(
-                            packets.filter(lambda (s): http.HTTPRequest in s),
-                            packets.filter(lambda (s): http.HTTPResponse in s)
-                        )
-                    ]
-            except Scapy_Exception as e:
-                self.warning(e.message)
+                    network["HTTP"] = \
+                        [
+                            {
+                                "request": request.payload[http.HTTPRequest],
+                                "response": response.payload[http.HTTPResponse]
+                            }  
+                            for request, response in \
+                            zip(
+                                packets.filter(lambda (s): http.HTTPRequest in s),
+                                packets.filter(lambda (s): http.HTTPResponse in s)
+                            )
+                        ]
+                except Scapy_Exception as e:
+                     self.warning(e.message)
             _v = []
             for v in [analysis["modules"][module]["run"]["vulnerabilities"]
                       for module in analysis["modules"] if len(analysis["modules"][module]["run"]["vulnerabilities"])]:
