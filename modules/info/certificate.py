@@ -1,4 +1,4 @@
-import subprocess
+import os
 
 import framework
 import re
@@ -37,13 +37,10 @@ class Module(framework.module):
                 rsa = self.apk.get_file(cert_found)
                 f.write(rsa)
 
-            proc = subprocess.Popen(
-                ["openssl", "pkcs7", "-inform", "DER", "-in", "/tmp/%s.cert" % self.apk.get_package(),
-                 "-out", "/tmp/%s.pem" % self.apk.get_package(), "-outform", "PEM", "-print_certs"],
-                stderr=subprocess.PIPE
-            )
-            proc.wait()
-            if not proc.returncode:
+            p = os.popen("openssl pkcs7 -inform DER -in /tmp/%s.cert -out /tmp/%s.pem -outform PEM -print_certs" % (self.apk.get_package(), self.apk.get_package()))
+            output = p.read()
+	    p.close()
+            if not output:
                 x509 = X509.load_cert('/tmp/%s.pem' % self.apk.get_package())
                 dates = re.findall(r'Not Before: ([^\n]*)\n            Not After : ([^\n]*)\n', x509.as_text())
                 result = {

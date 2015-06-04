@@ -1,5 +1,3 @@
-import subprocess
-
 import framework
 from androguard.core.bytecodes import dvm
 from androguard.core.analysis.analysis import *
@@ -75,44 +73,24 @@ class Module(framework.module):
                                     objdump_outfile = \
                                         "%s/analysis/%s/code/native/lib%s.objdump" %\
                                         (self.root_dir, self.apk.get_package(), m)
-                                    with open(objdump_outfile, "wb") as f:
-                                        exitcode = subprocess.call(
-                                            "%s -D %s" % (objdump_bin, os.path.abspath(path)),
-                                            shell=True,
-                                            stdout=f,
-                                            stderr=subprocess.PIPE
-                                        )
-                                        if exitcode:
-                                            raise Exception("An error occured when running objdump on %s" % path)
-                                        else:
-                                            logs += "$ %s %s > %s\n" % \
-                                                    (objdump_bin, os.path.abspath(path), objdump_outfile)
+                                    p = os.popen("%s -D %s > %s" % (objdump_bin, os.path.abspath(path), objdump_outfile))
+				    output = p.read()
+				    p.close()
+                                    if output:
+                                        raise Exception("An error occured when running objdump on %s" % path)
+                                    else:
+                                        logs += "$ %s %s > %s\n" % \
+                                                (objdump_bin, os.path.abspath(path), objdump_outfile)
 
-                                p = subprocess.Popen(
-                                    "file %s | cut -d':' -f2" % os.path.abspath(path),
-                                    shell=True,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE
-                                )
-                                stdout, stderr = p.communicate()
-                                info = stdout if not stderr else stderr
-                                logs += "$ file %s\n%s\n" % (
-                                    os.path.abspath(path),
-                                    info
-                                )
+                                p = os.popen("file %s | cut -d':' -f2" % os.path.abspath(path))
+                                info = p.read()
+				p.close()
+                                logs += "$ file %s\n%s\n" % (os.path.abspath(path), info)
 
-                                p = subprocess.Popen(
-                                    "%s/libs/checksec.sh --file %s" % (self.root_dir, os.path.abspath(path)),
-                                    shell=True,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE
-                                )
-                                stdout, stderr = p.communicate()
-                                checksec = stdout if not stderr else stderr
-                                logs += "$ checksec.sh %s\n%s\n" % (
-                                    os.path.abspath(path),
-                                    checksec
-                                )
+                                p = os.popen("%s/libs/checksec.sh --file %s" % (self.root_dir, os.path.abspath(path)))
+                                checksec = p.read()
+				p.close()
+                                logs += "$ checksec.sh %s\n%s\n" % (os.path.abspath(path), checksec)
 
                                 libs.append(
                                     {
