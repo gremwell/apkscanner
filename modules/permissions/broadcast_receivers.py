@@ -304,25 +304,26 @@ class Module(framework.module):
         for receiver in receivers:
             receiver["vulnerable"] = False
             if receiver["exported"] and receiver["permission"] is None:
+		receiver["vulnerable"] = True
                 #1. Get exposed broadcast receivers from results
-                for intent in receiver["intent_filters"]:
-                    if intent['category'] is not None:
-                        output = self.avd.shell("am broadcast -a %s -c %s -n %s/%s" %
-                                                (intent['action'], intent['category'],
-                                                 self.apk.get_package(), receiver["name"]))
-                    else:
-                        output = self.avd.shell("am broadcast -a %s -n %s/%s" %
-                                                (intent['action'], self.apk.get_package(), receiver["name"]))
+		if self.avd is not None:
+	                for intent in receiver["intent_filters"]:
+	                    if intent['category'] is not None:
+	                        output = self.avd.shell("am broadcast -a %s -c %s -n %s/%s" %
+	                                                (intent['action'], intent['category'],
+	                                                 self.apk.get_package(), receiver["name"]))
+	                    else:
+	                        output = self.avd.shell("am broadcast -a %s -n %s/%s" %
+	                                                (intent['action'], self.apk.get_package(), receiver["name"]))
 
-                    if "Broadcast completed" not in output:
+	                    if "Broadcast completed" not in output:
 
-                        logs += "$ adb shell am broadcast -a %s -c %s -n %s/%s\n%s\n" % \
-                                (intent['action'], intent["category"], self.apk.get_package(), receiver["name"], output)
-                        receiver["vulnerable"] = True
-                        vulnerable = True
+        	                logs += "$ adb shell am broadcast -a %s -c %s -n %s/%s\n%s\n" % \
+	                                (intent['action'], intent["category"], self.apk.get_package(), receiver["name"], output)
+			    else:
+				receiver["vulnerable"] = False
 
-
-                if not len(receiver["intent_filters"]):
+                if not len(receiver["intent_filters"]) and self.avd is not None:
                     for category in categories:
                         for action in actions:
                             #2. Fuzz receivers with a set of intents (Null intents, malformed, ...)
@@ -333,7 +334,8 @@ class Module(framework.module):
                                 logs += "$ adb shell am broadcast -a %s -c %s -n %s/%s\n%s\n" % \
                                         (action, category, self.apk.get_package(), receiver["name"], output)
                                 receiver["vulnerable"] = True
-                                vulnerable = True
+	    if receiver["vulnerable"] is True:
+		vulnerable = True
 
         return {
             "results": receivers,

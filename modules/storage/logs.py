@@ -22,15 +22,13 @@ class Module(framework.module):
 
         results = {}
 
-        d = dvm.DalvikVMFormat(self.apk.get_dex())
-        dx = VMAnalysis(d)
-        z = dx.tainted_packages.search_packages("Log")
+        z = self.apk.vm_analysis.tainted_packages.search_packages("Log")
         for p in z:
-            method = d.get_method_by_idx(p.get_src_idx())
+            method = self.apk.dalvik_vm_format.get_method_by_idx(p.get_src_idx())
             if self.apk.package.replace(".", "/") in method.get_class_name()[1:-1]:
                 if method.get_code() is None:
                     continue
-                mx = dx.get_method(method)
+                mx = self.apk.vm_analysis.get_method(method)
                 ms = decompile.DvMethod(mx)
                 try:
                     ms.process()

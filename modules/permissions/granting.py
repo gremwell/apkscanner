@@ -23,14 +23,9 @@ class Module(framework.module):
     def module_run(self, verbose=False):
 
         #TODO: the real issue is that "is the code linked to a permission really reached during runtime ?"
-
-        d = dvm.DalvikVMFormat(self.apk.get_dex())
-        dx = VMAnalysis(d)
-        d.set_vmanalysis(dx)
-
         results = {
             "manifest_permissions": {},
-            "app_permissions": ["android.permission.%s" % (str(p)) for p in dx.get_permissions([])]
+            "app_permissions": ["android.permission.%s" % (str(p)) for p in self.apk.vm_analysis.get_permissions([])]
         }
         for p in self.get_permissions():
             results["manifest_permissions"][p] = {}
@@ -42,12 +37,12 @@ class Module(framework.module):
             results["manifest_permissions"][p]["description"] = DVM_PERMISSIONS["MANIFEST_PERMISSION"][_p][2] \
                 if _p in DVM_PERMISSIONS["MANIFEST_PERMISSION"] else "unknown"
 
-        perms = dx.get_permissions([])
+        perms = self.apk.vm_analysis.get_permissions([])
         for perm in perms:
             t = False
             for path in perms[perm]:
                 if isinstance(path, PathP):
-                    method = d.get_method_by_idx(path.get_src_idx())
+                    method = self.apk.dalvik_vm_format.get_method_by_idx(path.get_src_idx())
                     if self.apk.get_package() in method.get_class_name().replace("/", "."):
                         if method.get_code() is None:
                             continue

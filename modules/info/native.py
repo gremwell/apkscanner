@@ -1,6 +1,4 @@
 import framework
-from androguard.core.bytecodes import dvm
-from androguard.core.analysis.analysis import *
 from androguard.decompiler.dad import decompile
 import re
 import os
@@ -25,17 +23,15 @@ class Module(framework.module):
         vulnerabilities = []
         libs = []
             
-        d = dvm.DalvikVMFormat(self.apk.get_dex())
-        dx = VMAnalysis(d)
-        z = dx.tainted_packages.search_methods(".", "loadLibrary", ".")
+        z = self.apk.vm_analysis.tainted_packages.search_methods(".", "loadLibrary", ".")
 
         for p in z:
-            method = d.get_method_by_idx(p.get_src_idx())
+            method = self.apk.dalvik_vm_format.get_method_by_idx(p.get_src_idx())
 
             if method.get_code() is None:
                 continue
 
-            mx = dx.get_method(method)
+            mx = self.apk.vm_analysis.get_method(method)
             ms = decompile.DvMethod(mx)
             try:
                     ms.process()
