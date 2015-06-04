@@ -18,6 +18,9 @@ import subprocess
 import framework
 from androguard.core import androconf
 from androguard.core.bytecodes import apk
+from androguard.core.bytecodes import dvm
+from androguard.core.analysis.analysis import *
+from androguard.core.analysis.ganalysis import *
 from android import *
 from jinja2 import Environment, FileSystemLoader
 import codecs
@@ -184,6 +187,7 @@ class APKScanner(framework.module):
                     "run": m.module_run(verbose=self.verbose),
                     "end_time": int(time.time())
                 }
+		del m
                 for v in r["run"]["vulnerabilities"]:
                     self.alert(v["name"])
                 self.analysis["modules"][k] = r
@@ -231,8 +235,16 @@ class APKScanner(framework.module):
                 if androconf.is_android(self.apk_filename) == "APK":
                     a = apk.APK(self.apk_filename, zipmodule=2)
                     if a.is_valid_APK():
-                        self.apk = a
+        		#TODO: the idea is to add DalvikVM loading code here too as it's taking a lot of time to parse it in each module that use it.
+	                self.apk = a
                         self.manifest = self.apk.get_android_manifest_xml().getElementsByTagName("manifest")[0]
+			setattr(self.apk, 'dalvik_vm_format', dvm.DalvikVMFormat(self.apk.get_dex()))
+		        setattr(self.apk, 'vm_analysis', VMAnalysis(self.apk.dalvik_vm_format))
+		        self.apk.dalvik_vm_format.set_vmanalysis(self.apk.vm_analysis)
+			self.apk.dalvik_vm_format.create_python_export()
+		        gx = GVMAnalysis(self.apk.vm_analysis, None)
+        		self.apk.dalvik_vm_format.set_gvmanalysis(gx)
+		        self.apk.dalvik_vm_format.create_xref()
                     else:
                         self.error("The APK file you provided is not valid.")
                 else:

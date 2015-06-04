@@ -1,6 +1,6 @@
 import framework
 
-import subprocess
+import os
 
 
 class Module(framework.module):
@@ -47,28 +47,24 @@ class Module(framework.module):
             else:
                 #forward jdwp and connect remotely with jdb
                 logs += "$ adb forward tcp:54321 jdwp:%d\n" % pid
-                p = subprocess.Popen(
+                p = os.popen(
                     "adb -s emulator-%d forward tcp:54321 jdwp:%d" % (self.avd._id, pid),
-                    shell=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
                 )
-                stdout, stderr = p.communicate()
-                if stderr:
-                    raise Exception(stderr)
+                output = p.read()
+		p.close()
+                if "Error:" in output:
+                    raise Exception(output)
                 else:
-                    p = subprocess.Popen(
+                    p = os.popen(
                         "echo 'classes' | jdb -attach localhost:54321 | grep %s" % self.apk.get_package(),
-                        shell=True,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE
                     )
-                    stdout, stderr = p.communicate()
-                    logs += "$ jdb -attach localhost:54321\n> classes\n%s" % stdout if not stderr else stderr
-                    if stderr:
+                    output = p.read()
+		    p.close()
+                    logs += "$ jdb -attach localhost:54321\n> classes\n%s" % output
+                    if "Error" in output:
                         debuggable = False
                     else:
-                        if "Unable to attach to target VM." in stdout:
+                        if "Unable to attach to target VM." in output:
                             debuggable = False
 
         if verbose:
