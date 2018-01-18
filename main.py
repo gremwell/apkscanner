@@ -1,6 +1,8 @@
 import sys
 import argparse
 import os
+reload(sys)
+sys.setdefaultencoding("utf-8")
 sys.path.append('./core/')
 from base import APKScanner, __author__, __email__, __version__
 
