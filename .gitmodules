@@ -1,3 +1,0 @@
-[submodule "libs/sqlmap"]
-	path = libs/sqlmap
-	url = git@github.com:sqlmapproject/sqlmap.git
