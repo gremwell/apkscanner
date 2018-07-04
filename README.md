@@ -5,7 +5,7 @@ Android application penetration testing for the masses !
 ## Installation
 
 ```
-$ git clone git@bitbucket.org:gremwell/apkscanner.git
+$ git clone git@github.com:gremwell/apkscanner.git
 $ cd apkscanner
 $ ./install_requirements.sh
 $ virtualenv env
@@ -227,7 +227,7 @@ Once the file has been disassembled, APKScanner will each module from the `modul
 ### Emulator instrumentation
 
 A python library take care of the Android emulator instrumentation.
-This library is located in [libs/android](https://bitbucket.org/gremwell/apkscanner/src/30723f816b362d4c0fefac4b54247268a7f55b58/libs/android/?at=master).
+This library is located in [libs/android](https://github.com/gremwell/apkscanner/tree/master/libs/android).
 Complete documentation of this library can be found here.
 
 ### Reporting
