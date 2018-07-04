@@ -217,12 +217,12 @@ APKScanner disassemble the provided APK file by executing the following tasks:
 * unzip the file
 * convert dex to jar with dex2jar
 * convert dex to smali
-* decompile jar with jd-core
+* disassemble jar with jd-core
 * convert binary xml to human readable xml
 
 ### Modules
 
-Once the file has been disassembled, APKScanner will each module from the `modules` directory in successive order.
+Once the file has been disassembled, APKScanner will run each module from the `modules` directory in successive order.
 
 ### Emulator instrumentation
 
@@ -241,4 +241,4 @@ The awesome module loading code has been inspired by the one in use at [Recon-ng
 
 ## License
 
-TBD
+See LICENSE file.
