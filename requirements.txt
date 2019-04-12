@@ -1,4 +1,4 @@
-Jinja2==2.7.3
+Jinja2>=2.8.1
 M2Crypto==0.22.3
 MarkupSafe==0.23
 argparse==1.2.1
